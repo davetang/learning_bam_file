@@ -1,0 +1,5 @@
+sequence
+script
+*.bam
+bwa
+*.swp
