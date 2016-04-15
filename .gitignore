@@ -1,5 +1,7 @@
 sequence
 script
-*.bam
+aln*
 bwa
 *.swp
+samtools*
+htslib*
