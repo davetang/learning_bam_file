@@ -141,18 +141,35 @@ samtools view -bS aln.sam > aln.bam
 
 # Converting a BAM file to a CRAM file
 
-The CRAM format saves you even more disk space.
+The CRAM format saves you even more disk space; disk usage of SAM = 5.5M, unordered BAM = 978K, ordered BAM = 746K, and CRAM = 91K
 
 ~~~~{.bash}
 samtools view -T sequence/ref.fa -C -o aln.cram aln.bam
+
+ls -hl aln.sam
+-rw-r--r-- 1 dtang dtang 5.5M Feb  9 16:55 aln.sam
+
+# unsorted BAM file
+ls -hl aln.bam
+-rw-r--r-- 1 dtang dtang 978K Feb 10 16:49 aln.bam
+
+# sorted BAM file
+ls -hl aln.bam
+-rw-r--r-- 1 dtang dtang 746K Feb 10 16:50 aln.bam
+
+# CRAM from sorted BAM file
+ls -hl aln.cram 
+-rw-r--r-- 1 dtang dtang 91K Feb 10 16:52 aln.cram
 ~~~~
+
+I have an [old blog post](https://davetang.org/muse/2014/09/26/bam-to-cram/) on the CRAM format.
 
 # Sorting a BAM file
 
 Always sort your BAM files; many downstream programs only take sorted BAM files.
 
 ~~~~{.bash}
-samtools sort aln.bam aln
+samtools sort aln.bam -o aln.bam
 ~~~~
 
 # Converting SAM directly to a sorted BAM file
@@ -160,7 +177,7 @@ samtools sort aln.bam aln
 Like many Unix tools, SAMTools is able to read directly from a stream i.e. stdout.
 
 ~~~~{.bash}
-samtools view -bS aln.sam | samtools sort - aln
+samtools view -bS aln.sam | samtools sort - -o aln.bam
 ~~~~
 
 # Creating a BAM index file
