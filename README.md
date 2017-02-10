@@ -1,7 +1,6 @@
 Table of Contents
 =================
 
-   * [README](#readme)
    * [Introduction](#introduction)
    * [Installing SAMTools](#installing-samtools)
    * [Basic usage](#basic-usage)
@@ -24,7 +23,7 @@ Table of Contents
 
 Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
-# README
+# Introduction
 
 One of my most popular pages on my website is this page, <http://davetang.org/wiki/tiki-index.php?page=SAMTools>, which has around 400,000 views to date (2016 April 15th). I decided to rewrite the page on GitHub because my hosting company has made several changes over the years that has broken the database behind that Wiki and removed means to fix it. Basically, I don't want to lose the information on that page so I have rewritten it here.
 
@@ -35,8 +34,6 @@ git clone https://github.com/davetang/learning_bam_file.git
 cd learning_bam_file/
 make
 ~~~~
-
-# Introduction
 
 SAMTools provides various tools for manipulating alignments in the SAM/BAM format. The SAM (Sequence Alignment/Map) format (BAM is just the binary form of SAM) is currently the de facto standard for storing large nucleotide sequence alignments. If you are dealing with high-throughput sequencing data, at some point you will probably have to deal with SAM/BAM files, so familiarise yourself with them! All of the examples below, use the ```aln.sam``` example SAM file that I created.
 
