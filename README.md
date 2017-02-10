@@ -1,3 +1,29 @@
+Table of Contents
+=================
+
+   * [README](#readme)
+   * [Introduction](#introduction)
+   * [Installing SAMTools](#installing-samtools)
+   * [Basic usage](#basic-usage)
+   * [Converting a SAM file to a BAM file](#converting-a-sam-file-to-a-bam-file)
+   * [Converting a BAM file to a CRAM file](#converting-a-bam-file-to-a-cram-file)
+   * [Sorting a BAM file](#sorting-a-bam-file)
+   * [Converting SAM directly to a sorted BAM file](#converting-sam-directly-to-a-sorted-bam-file)
+   * [Creating a BAM index file](#creating-a-bam-index-file)
+   * [Converting a BAM file to a SAM file](#converting-a-bam-file-to-a-sam-file)
+   * [Filtering out unmapped reads in BAM files](#filtering-out-unmapped-reads-in-bam-files)
+   * [Extracting SAM entries mapping to a specific loci](#extracting-sam-entries-mapping-to-a-specific-loci)
+   * [Extracting only the first read from paired end BAM files](#extracting-only-the-first-read-from-paired-end-bam-files)
+   * [Simple stats using samtools flagstat](#simple-stats-using-samtools-flagstat)
+   * [Interpreting the BAM flags](#interpreting-the-bam-flags)
+   * [samtools calmd/fillmd](#samtools-calmdfillmd)
+   * [Creating fastq files from a BAM file](#creating-fastq-files-from-a-bam-file)
+   * [Random subsampling of BAM file](#random-subsampling-of-bam-file)
+   * [Fastest way to count number of reads](#fastest-way-to-count-number-of-reads)
+   * [Obtaining genomic sequence](#obtaining-genomic-sequence)
+
+Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
+
 # README
 
 One of my most popular pages on my website is this page, <http://davetang.org/wiki/tiki-index.php?page=SAMTools>, which has around 400,000 views to date (2016 April 15th). I decided to rewrite the page on GitHub because my hosting company has made several changes over the years that has broken the database behind that Wiki and removed means to fix it. Basically, I don't want to lose the information on that page so I have rewritten it here.
@@ -129,7 +155,7 @@ samtools view -T sequence/ref.fa -C -o aln.cram aln.bam
 Always sort your BAM files; many downstream programs only take sorted BAM files.
 
 ~~~~{.bash}
-samtools sort aln.bam -o aln.bam
+samtools sort aln.bam aln
 ~~~~
 
 # Converting SAM directly to a sorted BAM file
@@ -137,7 +163,7 @@ samtools sort aln.bam -o aln.bam
 Like many Unix tools, SAMTools is able to read directly from a stream i.e. stdout.
 
 ~~~~{.bash}
-samtools view -bS aln.sam | samtools sort - -o aln.bam
+samtools view -bS aln.sam | samtools sort - aln
 ~~~~
 
 # Creating a BAM index file
