@@ -343,14 +343,26 @@ Note that this will subsample half of the reads that mapped.
 
 # Fastest way to count number of reads
 
-From <http://left.subtree.org/2012/04/13/counting-the-number-of-reads-in-a-bam-file/#comment-403>
+Use `samtools idxstats` to print stats on a BAM file; this requires an index file which is created by running `samtools index`. The reference sequence name of the example SAM file in this repository is (confusingly) called 1000000. More standard reference names are 'chr1', 'chr2', etc.
 
 ```bash
-# number of reads
+# convert to BAM and sort
+samtools view -bS aln.sam | samtools sort - > aln.bam
+
+# index
+samtools index aln.bam
+
+# output of idxstats is:
+# ref name, sequence length of ref, no. mapped reads, and no. unmapped reads
+samtools idxstats aln.bam
+1000000 1000000 20000   0
+*       0       0       0
+
+# number of reads = mapped + unmapped
 samtools idxstats aln.bam | awk '{s+=$3+$4} END {print s}'
 20000
 
-# number of mapped reads
+# number of mapped reads = 3rd column
 samtools idxstats aln.bam | awk '{s+=$3} END {print s}'
 20000
 ```
