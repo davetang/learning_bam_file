@@ -2,7 +2,7 @@ Table of Contents
 =================
 
    * [Introduction](#introduction)
-   * [Installing SAMTools](#installing-samtools)
+   * [Installing SAMtools](#installing-samtools)
    * [Basic usage](#basic-usage)
    * [Converting a SAM file to a BAM file](#converting-a-sam-file-to-a-bam-file)
    * [Converting a BAM file to a CRAM file](#converting-a-bam-file-to-a-cram-file)
@@ -35,9 +35,9 @@ cd learning_bam_file/
 make
 ```
 
-SAMTools provides various tools for manipulating alignments in the SAM/BAM format. The SAM (Sequence Alignment/Map) format (BAM is just the binary form of SAM) is currently the de facto standard for storing large nucleotide sequence alignments. If you are dealing with high-throughput sequencing data, at some point you will probably have to deal with SAM/BAM files, so familiarise yourself with them! All of the examples below, use the ```aln.sam``` example SAM file that I created.
+SAMtools provides various tools for manipulating alignments in the SAM/BAM format. The SAM (Sequence Alignment/Map) format (BAM is just the binary form of SAM) is currently the de facto standard for storing large nucleotide sequence alignments. If you are dealing with high-throughput sequencing data, at some point you will probably have to deal with SAM/BAM files, so familiarise yourself with them! All of the examples below, use the ```aln.sam``` example SAM file that I created.
 
-# Installing SAMTools
+# Installing SAMtools
 
 Just copy and paste the code below.
 
@@ -59,7 +59,7 @@ cd ..
 
 # Basic usage
 
-If you run SAMTools on the terminal without any parameters, all the available utilities are listed:
+If you run SAMtools on the terminal without any parameters, all the available utilities are listed:
 
 ```bash
 samtools
@@ -180,13 +180,22 @@ samtools sort aln.bam -o aln.bam
 
 # Converting SAM directly to a sorted BAM file
 
-Like many Unix tools, SAMTools is able to read directly from a stream i.e. stdout.
+Like many Unix tools, SAMtools is able to read directly from a stream i.e. stdout.
 
 ```bash
 samtools view -bS aln.sam | samtools sort - -o aln.bam
+```
 
-# in the newer version of SAMtools, we can do
-samtools view -b aln.sam | samtools sort > aln.bam
+In SAMtools version 1.3 or newer, you can sort a SAM file directly.
+
+```bash
+samtools sort -o aln.bam aln.sam
+```
+
+In addition, you should use use additional threads, if they are available, to speed up sorting.
+
+```bash
+samtools sort -@ 8 -o aln.bam aln.sam
 ```
 
 # Creating a BAM index file
@@ -333,7 +342,7 @@ samtools fastq -1 aln_1.fq -2 aln_2.fq aln.bam
 
 # Random subsampling of BAM file
 
-The SAMTools view -s parameter allows you to randomly sample lines of a BAM file
+The SAMtools view -s parameter allows you to randomly sample lines of a BAM file
 
 ```bash
 samtools view -s 0.5 -b aln.bam > aln_random.bam
