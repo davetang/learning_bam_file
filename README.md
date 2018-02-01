@@ -1,9 +1,11 @@
 Table of Contents
 =================
 
+   * [Table of Contents](#table-of-contents)
    * [Introduction](#introduction)
    * [Installing SAMtools](#installing-samtools)
    * [Basic usage](#basic-usage)
+   * [Viewing](#viewing)
    * [Converting a SAM file to a BAM file](#converting-a-sam-file-to-a-bam-file)
    * [Converting a BAM file to a CRAM file](#converting-a-bam-file-to-a-cram-file)
    * [Sorting a BAM file](#sorting-a-bam-file)
@@ -13,7 +15,7 @@ Table of Contents
    * [Filtering out unmapped reads in BAM files](#filtering-out-unmapped-reads-in-bam-files)
    * [Extracting SAM entries mapping to a specific loci](#extracting-sam-entries-mapping-to-a-specific-loci)
    * [Extracting only the first read from paired end BAM files](#extracting-only-the-first-read-from-paired-end-bam-files)
-   * [Simple stats using samtools flagstat](#simple-stats-using-samtools-flagstat)
+   * [Stats](#stats)
    * [Interpreting the BAM flags](#interpreting-the-bam-flags)
    * [samtools calmd/fillmd](#samtools-calmdfillmd)
    * [Creating fastq files from a BAM file](#creating-fastq-files-from-a-bam-file)
@@ -25,9 +27,9 @@ Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
 # Introduction
 
-One of my most popular pages on my website is this page, <http://davetang.org/wiki/tiki-index.php?page=SAMTools>, which has around 400,000 views to date (2016 April 15th). I decided to rewrite the page on GitHub because my hosting company has made several changes over the years that has broken the database behind that Wiki and removed means to fix it. Basically, I don't want to lose the information on that page so I have rewritten it here.
+One of my most popular pages on my website is my [SAMtools page](http://davetang.org/wiki/tiki-index.php?page=SAMTools), which I created back in 2011. Unfortunately I can no longer edit that page for technical reasons, so I have migrated the information here. My examples do not include the `-@` argument, which allows the extremely useful feature of multi-threading. This is a very useful feature given that BAM files can get rather huge these days. For the latest information, please refer to the [release notes](https://github.com/samtools/samtools/releases).
 
-In addition, I have created an example SAM file to demonstrate the commands. The steps to create ```aln.sam``` are inside the ```run.sh``` script. The reads in the SAM file are created from a randomly generated reference sequence; typing ```make``` will run all the steps used to create the file.
+I have created an example SAM file to demonstrate the commands. The steps to create `aln.sam` are inside the `run.sh` script. The reads in the SAM file are created from a randomly generated reference sequence; typing `make` will run all the steps used to create the file.
 
 ```bash
 git clone https://github.com/davetang/learning_bam_file.git
@@ -35,23 +37,23 @@ cd learning_bam_file/
 make
 ```
 
-SAMtools provides various tools for manipulating alignments in the SAM/BAM format. The SAM (Sequence Alignment/Map) format (BAM is just the binary form of SAM) is currently the de facto standard for storing large nucleotide sequence alignments. If you are dealing with high-throughput sequencing data, at some point you will probably have to deal with SAM/BAM files, so familiarise yourself with them! All of the examples below, use the ```aln.sam``` example SAM file that I created.
+SAMtools provides various tools for manipulating alignments in the SAM/BAM format. The SAM (Sequence Alignment/Map) format (BAM is just the binary form of SAM) is currently the _de facto_ standard for storing large nucleotide sequence alignments. If you are dealing with high-throughput sequencing data, at some point you will probably have to deal with SAM/BAM files, so familiarise yourself with them! All of the examples below, use the `aln.sam` example SAM file that I created.
 
 # Installing SAMtools
 
 Just copy and paste the code below.
 
 ```bash
-wget https://github.com/samtools/htslib/releases/download/1.3/htslib-1.3.tar.bz2
-tar -xjf htslib-1.3.tar.bz2
-cd htslib-1.3
+wget https://github.com/samtools/htslib/releases/download/1.7/htslib-1.7.tar.bz2
+tar -xjf htslib-1.7.tar.bz2
+cd htslib-1.7
 make
 make prefix=. install
 cd ..
 
-wget https://github.com/samtools/samtools/releases/download/1.3/samtools-1.3.tar.bz2
-tar -xjf samtools-1.3.tar.bz2
-cd samtools-1.3
+wget https://github.com/samtools/samtools/releases/download/1.7/samtools-1.7.tar.bz2
+tar -xjf samtools-1.7.tar.bz2
+cd samtools-1.7
 make
 make prefix=. install
 cd ..
@@ -65,7 +67,7 @@ If you run SAMtools on the terminal without any parameters, all the available ut
 samtools
 
 Program: samtools (Tools for alignments in the SAM format)
-Version: 1.3 (using htslib 1.3)
+Version: 1.7 (using htslib 1.7)
 
 Usage:   samtools <command> [options]
 
@@ -79,9 +81,9 @@ Commands:
      calmd          recalculate MD/NM tags and '=' bases
      fixmate        fix mate information
      reheader       replace BAM header
-     rmdup          remove PCR duplicates
      targetcut      cut fosmid regions (for fosmid pool only)
      addreplacerg   adds or replaces RG tags
+     markdup        mark duplicates
 
   -- File operations
      collate        shuffle and group alignments by name
@@ -107,7 +109,18 @@ Commands:
      tview          text alignment viewer
      view           SAM<->BAM<->CRAM conversion
      depad          convert padded BAM to unpadded BAM
+
 ```
+
+# Viewing
+
+Use [bioSyntax](https://github.com/bioSyntax/bioSyntax) to prettify your output.
+
+```bash
+samtools view aln.bam | sam-less
+```
+
+![bioSyntax](img/sam_less.png)
 
 # Converting a SAM file to a BAM file
 
@@ -230,7 +243,7 @@ samtools flags 4
 
 # Extracting SAM entries mapping to a specific loci
 
-If we want all reads mapping within a specific genomic region, we can use ```samtools view``` and the ```ref:start-end``` syntax. The name of the reference sequence in my example SAM file is 1000000.
+If we want all reads mapping within a specific genomic region, we can use `samtools view` and the `ref:start-end` syntax. The name of the reference sequence in my example SAM file is 1000000. You can use just the `ref` to extract an entire reference sequence such as a chromosome (example not shown here).
 
 ```bash
 # index the bam file first
@@ -246,6 +259,27 @@ samtools view aln.bam 1000000:1000-1300
 samtools view -b aln.bam 1000000:1000-1300 > aln_1000_1300.bam
 ```
 
+You can also use a BED file, with several entries, to extract reads of interest.
+
+```bash
+cat my.bed 
+1000000 1000    1300
+1000000 2000    2300
+
+samtools view -L my.bed aln.bam
+6144:733        147     1000000 1033    60      100M    =       733     -400    CCCTCCGGGGAGGGGATCTATTAGGAAAGATTCGAGTCGGTACGTTGTATGGAACGGTTAGCACCGCCATATATCAGATTCAAAATTATCTAGGGTTTCA    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ  NM:i:0  MD:Z:100        AS:i:100        XS:i:0
+7897:1206       99      1000000 1206    60      100M    =       1506    400     TTGCCGTGTACTGGTTGAGCCATACGCAAAATTGGGATCACATTTGTATTGACGCAGGAAAACTGATGCCCGTATCTCCAGAGGTACCAGAGCGACCTGG    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ  NM:i:0  MD:Z:100        AS:i:100        XS:i:0
+9588:1278       99      1000000 1278    60      100M    =       1578    400     TATCTCCAGAGGTACCAGAGCGACCTGGACTTCAGCCAGGGAGATAGAGTATCACACTGAAGGACGGTAGCCGATAGATGAGCTGGACCTTGGATCTACT    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ  NM:i:0  MD:Z:100        AS:i:100        XS:i:0
+10:1630 147     1000000 1930    60      100M    =       1630    -400    CCACCCACTACAGTAAATGAGAGAAAACGGATTAAGGTTCTAACCCTTAGCGATGACCGTTCTCACGGGTGTCTAGATACCGAGTAGAACCAACCAGCAC    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ  NM:i:0  MD:Z:100        AS:i:100        XS:i:0
+9137:1657       147     1000000 1957    60      100M    =       1657    -400    CGGATTAAGGTTCTAACCCTTAGCGATGACCGTTCTCACGGGTGTCTAGATACCGAGTAGAACCAACCAGCACCCAGCATTAAACCACAGAAGCACCGTT    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ  NM:i:0  MD:Z:100        AS:i:100        XS:i:0
+5893:1667       147     1000000 1967    60      100M    =       1667    -400    TTCTAACCCTTAGCGATGACCGTTCTCACGGGTGTCTAGATACCGAGTAGAACCAACCAGCACCCAGCATTAAACCACAGAAGCACCGTTGGTTTCTTTA    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ  NM:i:0  MD:Z:100        AS:i:100        XS:i:0
+3617:1997       99      1000000 1997    60      100M    =       2297    400     GGTGTCTAGATACCGAGTAGAACCAACCAGCACCCAGCATTAAACCACAGAAGCACCGTTGGTTTCTTTAATAGCTTCAACGCCGGCCATATCAATAAAA    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ  NM:i:0  MD:Z:100        AS:i:100        XS:i:0
+5736:1773       147     1000000 2073    60      100M    =       1773    -400    TCAACGCCGGCCATATCAATAAAAGGCTGTCGCCACATCCGTGGGTGCAAACTGAGCAGCCATGAACCTGGAAACGTTGTAGCCATGAAGATAATGCATA    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ  NM:i:0  MD:Z:100        AS:i:100        XS:i:0
+3123:2230       99      1000000 2230    60      100M    =       2530    400     CGGCACGTGCTGTCAGTATATAGTGTCGCTCATCAGGGAGGTACACCACGCGGTGGAGCATCCACGCTTTTCCCCATCTTCTATTACCTCGGCGGGGAAA    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ  NM:i:0  MD:Z:100        AS:i:100        XS:i:0
+4758:2263       99      1000000 2263    60      100M    =       2563    400     CAGGGAGGTACACCACGCGGTGGAGCATCCACGCTTTTCCCCATCTTCTATTACCTCGGCGGGGAAACAGGTAGATATGGGGGTTGGCTTGTGCAAGATA    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ  NM:i:0  MD:Z:100        AS:i:100        XS:i:0
+3617:1997       147     1000000 2297    60      100M    =       1997    -400    TTTTCCCCATCTTCTATTACCTCGGCGGGGAAACAGGTAGATATGGGGGTTGGCTTGTGCAAGATACAATTCGATAGTTGCGGGGGCTTAGATCGGCGTG    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ  NM:i:0  MD:Z:100        AS:i:100        XS:i:0
+```
+
 # Extracting only the first read from paired end BAM files
 
 Sometimes you only want the first pair of a mate.
@@ -256,9 +290,9 @@ samtools view -h -f 0x0040 aln.bam > aln_first_pair.sam
 
 0x0040 is hexadecimal for 64 (i.e. 16 * 4), which is binary for 1000000, corresponding to the read in the first read pair.
 
-# Simple stats using samtools flagstat
+# Stats
 
-The flagstat command provides simple statistics on a BAM file.
+For simple statistics use `samtools flagstat`.
 
 ```bash
 samtools flagstat aln.bam
@@ -275,6 +309,72 @@ samtools flagstat aln.bam
 0 + 0 singletons (0.00% : N/A)
 0 + 0 with mate mapped to a different chr
 0 + 0 with mate mapped to a different chr (mapQ>=5)
+```
+
+For more stats, use `samtools stats`.
+
+```bash
+samtools stats aln.bam | grep ^SN
+SN      raw total sequences:    20000
+SN      filtered sequences:     0
+SN      sequences:      20000
+SN      is sorted:      1
+SN      1st fragments:  10000
+SN      last fragments: 10000
+SN      reads mapped:   20000
+SN      reads mapped and paired:        20000   # paired-end technology bit set + both mates mapped
+SN      reads unmapped: 0
+SN      reads properly paired:  20000   # proper-pair bit set
+SN      reads paired:   20000   # paired-end technology bit set
+SN      reads duplicated:       0       # PCR or optical duplicate bit set
+SN      reads MQ0:      0       # mapped and MQ=0
+SN      reads QC failed:        0
+SN      non-primary alignments: 0
+SN      total length:   2000000 # ignores clipping
+SN      bases mapped:   2000000 # ignores clipping
+SN      bases mapped (cigar):   2000000 # more accurate
+SN      bases trimmed:  0
+SN      bases duplicated:       0
+SN      mismatches:     0       # from NM fields
+SN      error rate:     0.000000e+00    # mismatches / bases mapped (cigar)
+SN      average length: 100
+SN      maximum length: 100
+SN      average quality:        41.0
+SN      insert size average:    400.0
+SN      insert size standard deviation: 0.0
+SN      inward oriented pairs:  10000
+SN      outward oriented pairs: 0
+SN      pairs with other orientation:   0
+SN      pairs on different chromosomes: 0
+```
+
+In addition, you can create plots from the `samtools stats` output using `plot-bamstats`; you need to have `gnuplot` installed though. `plot-bamstats` is located in the `misc` directory where you downloaded `samtools`.
+
+```bash
+samtools stats aln.bam > aln.stat
+
+~/src/samtools-1.6/misc/plot-bamstats -p out/ aln.stat
+
+ls -1 out
+acgt-cycles.gp
+acgt-cycles.png
+coverage.gp
+coverage.png
+gc-content.gp
+gc-content.png
+gc-depth.gp
+gc-depth.png
+index.html
+insert-size.gp
+insert-size.png
+quals-hm.gp
+quals-hm.png
+quals.gp
+quals.png
+quals2.gp
+quals2.png
+quals3.gp
+quals3.png
 ```
 
 # Interpreting the BAM flags
