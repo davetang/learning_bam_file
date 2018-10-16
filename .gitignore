@@ -1,6 +1,5 @@
 sequence
 script
-aln*
 bwa
 *.swp
 samtools*

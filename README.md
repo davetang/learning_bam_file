@@ -22,6 +22,7 @@ Table of Contents
    * [Random subsampling of BAM file](#random-subsampling-of-bam-file)
    * [Fastest way to count number of reads](#fastest-way-to-count-number-of-reads)
    * [Obtaining genomic sequence](#obtaining-genomic-sequence)
+   * [Comparing BAM files](#comparing-bam-files)
 
 Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
@@ -496,4 +497,22 @@ samtools faidx sequence/ref.fa 1000000:1-2
 >1000000:1-2
 AG
 ```
+
+# Comparing BAM files
+
+Install [deepTools](https://deeptools.readthedocs.io/en/develop/) and use [bamCompare](https://deeptools.readthedocs.io/en/develop/content/tools/bamCompare.html). The bigWig output file shows the ratio of reads between `b1` and `b2` in 50 bp (default) windows.
+
+```bash
+# create BAM files
+samtools view -bS aln.sam | samtools sort > aln.bam
+samtools view -bS aln2.sam | samtools sort > aln2.bam
+
+# index
+samtools index aln.bam
+samtools index aln2.bam
+
+bamCompare -b1 aln.bam -b2 aln2.bam -of bigwig -o aln_compare.bw
+```
+
+![bamCompare](img/bam_compare_igv.png)
 
