@@ -23,6 +23,7 @@ Table of Contents
    * [Fastest way to count number of reads](#fastest-way-to-count-number-of-reads)
    * [Obtaining genomic sequence](#obtaining-genomic-sequence)
    * [Comparing BAM files](#comparing-bam-files)
+   * [Coverage](#coverage)
 
 Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
