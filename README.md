@@ -516,3 +516,40 @@ bamCompare -b1 aln.bam -b2 aln2.bam -of bigwig -o aln_compare.bw
 
 ![bamCompare](img/bam_compare_igv.png)
 
+# Coverage
+
+We can use `samtools depth` to tally the number of reads covering a region; the three columns are the reference, position, and read coverage. In the example below, there are two reads covering positions 200 - 205. The `samtools mpileup` command can provide more information, including:
+
+1. Sequence name
+2. 1-based coordinate
+3. Reference base
+4. Number of reads covering this position
+5. Read bases
+6. Base qualities
+7. Alignment mapping qualities
+
+See https://davetang.org/muse/2015/08/26/samtools-mpileup/ for more information.
+
+```bash
+# create sorted BAM file
+samtools view -b aln.sam | samtools sort - -o aln.bam
+
+samtools depth aln.bam | sed -n '50,55p'
+1000000 200     2
+1000000 201     2
+1000000 202     2
+1000000 203     2
+1000000 204     2
+1000000 205     2
+
+samtools mpileup -f sequence/ref.fa -s aln.bam | sed -n '50,55p'
+[mpileup] 1 samples in 1 input files
+<mpileup> Set max per-file depth to 8000
+1000000 200     A       2       ..      JJ      ]]
+1000000 201     T       2       ..      JJ      ]]
+1000000 202     T       2       ..      JJ      ]]
+1000000 203     C       2       ..      JJ      ]]
+1000000 204     A       2       ..      JJ      ]]
+1000000 205     G       2       ..      JJ      ]]
+```
+
