@@ -1,0 +1,52 @@
+---
+title: "Rsubread"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## RSubread
+
+Install if necessary.
+
+```{r install}
+if(!"Rsubread" %in% installed.packages()){
+  if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+  BiocManager::install("Rsubread", version = "3.8")
+}
+library(Rsubread)
+```
+
+Load example BED file and convert to annotation format:
+
+1. GeneID
+2. Chr
+3. Start
+4. End
+5. Strand
+
+```{r load_bed}
+my_bed <- read.table(file = "my.bed",
+                     header = FALSE,
+                     stringsAsFactors = FALSE)
+
+my_ann <- data.frame(GeneID = 1:2,
+                     Chr = my_bed$V1,
+                     Start = my_bed$V2,
+                     End = my_bed$V3,
+                     Strand = rep(".", 2),
+                     stringsAsFactors = FALSE)
+my_ann
+```
+
+Use `featureCounts` to count reads overlapping regions of interest.
+
+```{r feature_count, message=FALSE, warning=FALSE}
+my_count <- featureCounts("aln.bam", annot.ext = my_ann)
+
+cbind(my_count$annotation, my_count$counts)
+```
