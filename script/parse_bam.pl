@@ -28,7 +28,15 @@ my @alignments = $sam->get_features_by_location(-seq_id => $ref[0],
                                                 -start  => 0,
                                                 -end    => 1000);
 
+# header information
+my $bam_object = Bio::DB::Bam->open($bam);
+my $header = $bam_object->header;
+my $text = $header->text;
+
 for my $a (@alignments) {
+
+   # alignment line
+   my $line = $a->tam_line;
 
    # get NM tag
    my $nm = $a->get_tag_values('NM');
@@ -44,7 +52,7 @@ for my $a (@alignments) {
    } elsif ($strand == -1){
       $strand = "-";
    }
-   print join("\t", $seqid, $start, $end, $strand, $mapping_qual, $nm), "\n";
+   # print join("\t", $seqid, $start, $end, $strand, $mapping_qual, $nm), "\n";
 
    # sequence information
    my $ref_dna   = $a->dna;
