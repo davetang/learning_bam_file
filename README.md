@@ -24,6 +24,7 @@ Table of Contents
    * [Obtaining genomic sequence](#obtaining-genomic-sequence)
    * [Comparing BAM files](#comparing-bam-files)
    * [Coverage](#coverage)
+   * [Docker](#docker)
 
 Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
@@ -552,5 +553,71 @@ samtools mpileup -f sequence/ref.fa -s aln.bam | sed -n '50,55p'
 1000000 203     C       2       ..      JJ      ]]
 1000000 204     A       2       ..      JJ      ]]
 1000000 205     G       2       ..      JJ      ]]
+```
+
+# Docker
+
+Run `samtools` within a Docker container.
+
+```bash
+# https://hub.docker.com/r/biocontainers/samtools
+docker pull biocontainers/samtools:v1.7.0_cv4
+
+# the image is quite large
+docker images | grep samtools
+biocontainers/samtools       v1.7.0_cv4          bdeba5ee5fc8        2 months ago        1.33GB
+
+# default usage
+docker run --rm biocontainers/samtools:v1.7.0_cv4 samtools
+
+Program: samtools (Tools for alignments in the SAM format)
+Version: 1.7 (using htslib 1.7)
+
+Usage:   samtools <command> [options]
+
+Commands:
+  -- Indexing
+     dict           create a sequence dictionary file
+     faidx          index/extract FASTA
+     index          index alignment
+
+  -- Editing
+     calmd          recalculate MD/NM tags and '=' bases
+     fixmate        fix mate information
+     reheader       replace BAM header
+     targetcut      cut fosmid regions (for fosmid pool only)
+     addreplacerg   adds or replaces RG tags
+     markdup        mark duplicates
+
+  -- File operations
+     collate        shuffle and group alignments by name
+     cat            concatenate BAMs
+     merge          merge sorted alignments
+     mpileup        multi-way pileup
+     sort           sort alignment file
+     split          splits a file by read group
+     quickcheck     quickly check if SAM/BAM/CRAM file appears intact
+     fastq          converts a BAM to a FASTQ
+     fasta          converts a BAM to a FASTA
+
+  -- Statistics
+     bedcov         read depth per BED region
+     depth          compute the depth
+     flagstat       simple stats
+     idxstats       BAM index stats
+     phase          phase heterozygotes
+     stats          generate stats (former bamcheck)
+
+  -- Viewing
+     flags          explain BAM flags
+     tview          text alignment viewer
+     view           SAM<->BAM<->CRAM conversion
+     depad          convert padded BAM to unpadded BAM
+```
+
+Use `-v` to mount a file to the Docker container.
+
+```bash
+docker run --rm -v /Users/dtang/github/learning_bam_file/:/tmp/ biocontainers/samtools:v1.7.0_cv4 samtools view -bS /tmp/aln.sam -o /tmp/aln2.bam
 ```
 
