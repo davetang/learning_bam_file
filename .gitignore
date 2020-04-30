@@ -2,4 +2,3 @@ bwa
 *.swp
 samtools*
 htslib*
-*.bam

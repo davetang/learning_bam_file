@@ -26,7 +26,7 @@ my $sam = Bio::DB::Sam->new(
 my @ref = $sam->seq_ids;
 my @alignments = $sam->get_features_by_location(-seq_id => $ref[0],
                                                 -start  => 0,
-                                                -end    => 1000);
+                                                -end    => 20000);
 
 # header information
 my $bam_object = Bio::DB::Bam->open($bam);
@@ -37,11 +37,13 @@ for my $a (@alignments) {
 
    # alignment line
    my $line = $a->tam_line;
+   # print "$line\n";
 
    # get NM tag
    my $nm = $a->get_tag_values('NM');
  
    # alignment information
+   my $read_id =  $a->display_name;
    my $seqid  = $a->seq_id;
    my $start  = $a->start;
    my $end    = $a->end;
@@ -52,7 +54,7 @@ for my $a (@alignments) {
    } elsif ($strand == -1){
       $strand = "-";
    }
-   # print join("\t", $seqid, $start, $end, $strand, $mapping_qual, $nm), "\n";
+   print join("\t", $read_id, $seqid, $start, $end, $strand, $mapping_qual, $nm), "\n";
 
    # sequence information
    my $ref_dna   = $a->dna;
@@ -63,7 +65,7 @@ for my $a (@alignments) {
    # query sequence information
    my $query_start = $a->query->start;     
    my $query_end   = $a->query->end;
-   # print join("\t", $query_start, $query_end), "\n";
+   # print join("\t", $query_start, $query_end, $query_dna), "\n";
 
    # CIGAR string
    my $cigar  = $a->cigar_str;
