@@ -7,13 +7,14 @@ use Getopt::Std;
 use Parallel::ForkManager;
 
 my %opts = ();
-getopts('b:t:l:i:s:p:h:f:', \%opts);
+getopts('b:t:l:i:s:p:h:f:r:', \%opts);
 
 if ( $opts{'h'} ||
    !exists $opts{'b'} ||
    !exists $opts{'l'} ||
    !exists $opts{'f'} ||
-   !exists $opts{'i'}
+   !exists $opts{'i'} ||
+   !exists $opts{'r'}
 ){
    usage();
 }
@@ -23,6 +24,7 @@ my $bam_file   = $opts{'b'};
 my $list       = $opts{'l'};
 my $fasta_file = $opts{'f'};
 my $idx_file   = $opts{'i'};
+my $read_len   = $opts{'r'};
 
 my $num_split  = 40;
 my $processes  = 8;
@@ -67,7 +69,7 @@ foreach my $ref (@ref){
    for (my $i = 0; $i < $num_split; ++$i){
 
       my $chunk_start = $i * $chunk;
-      my $chunk_end   = ($i + 1) * $chunk;
+      my $chunk_end   = ($i + 1) * $chunk - $read_len;
       if ($chunk_end > $ref_size{$ref}){
          $chunk_end = $ref_size{$ref}
       }
@@ -96,7 +98,7 @@ foreach my $infile (@chunk){
       print "$_\n";
    }
    close(IN);
-   unlink($infile);
+   # unlink($infile);
 }
 
 warn("Done\n");
@@ -173,9 +175,10 @@ sub get_ref_size {
 
 sub usage {
 print STDERR <<EOF;
-Usage: $0 -b FILE -l FILE -t DIR -p INT -s INT
+Usage: $0 -b FILE -l FILE -t DIR -p INT -s INT -r INT
 
        -b infile.bam          BAM file
+       -r 100                 Length of a read
        -l list.txt            List of read IDs
        -f genome.fasta        FASTA file used for read alignment
        -i file.idxstats       Output from samtools idxstats saved in a file
