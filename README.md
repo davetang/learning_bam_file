@@ -25,6 +25,7 @@ Table of Contents
    * [Comparing BAM files](#comparing-bam-files)
    * [Coverage](#coverage)
    * [Docker](#docker)
+   * [Stargazers over time](#stargazers-over-time)
 
 Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
@@ -626,3 +627,6 @@ Use `-v` to mount a file to the Docker container.
 docker run --rm -v /Users/dtang/github/learning_bam_file/:/tmp/ biocontainers/samtools:v1.7.0_cv4 samtools view -bS /tmp/aln.sam -o /tmp/aln2.bam
 ```
 
+# Stargazers over time
+
+[![Stargazers over time](https://starchart.cc/davetang/learning_bam_file.svg)](https://starchart.cc/davetang/learning_bam_file)
