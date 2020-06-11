@@ -23,6 +23,7 @@ Table of Contents
    * [Fastest way to count number of reads](#fastest-way-to-count-number-of-reads)
    * [Obtaining genomic sequence](#obtaining-genomic-sequence)
    * [Comparing BAM files](#comparing-bam-files)
+   * [Converting reference names](#converting-reference-names)
    * [Coverage](#coverage)
    * [Docker](#docker)
    * [Stargazers over time](#stargazers-over-time)
@@ -523,6 +524,41 @@ bamCompare -b1 aln.bam -b2 aln2.bam -of bigwig -o aln_compare.bw
 ```
 
 ![bamCompare](img/bam_compare_igv.png)
+
+# Converting reference names
+
+One of the most annoying bioinformatics problems is the use of different chromosome names, e.g. chr1 vs 1, in different references even when the sequences are identical. The GRCh38 reference downloaded from Ensembl has chromosome names without the `chr`:
+
+    >1 dna:chromosome chromosome:GRCh38:1:1:248956422:1 REF
+
+Whereas the reference names from UCSC has the `chr`:
+
+    >chr1  AC:CM000663.2  gi:568336023  LN:248956422  rl:Chromosome  M5:6aef897c3d6ff0c78aff06ac189178dd  AS:GRCh38
+
+Luckily you can change the reference names using `samtools reheader` but just make sure your reference sequences are actually identical. Let's change the reference name for `aln.bam` by modifying the header.
+
+```bash
+samtools view aln.bam | head -2
+6125:151        99      1000000 151     60      100M    =       451     400     TAGTTCTAAGCGGCGAGTACCTAAGGGGCGGGGGGACTGACCGCCAGCTATTCAGTGAGTAAAGGGGAACCCTTCTTAGGTGCGCGTGTGTAAGAGAGCG    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ     NM:i:0  MD:Z:100        AS:i:100        XS:i:0
+9336:174        99      1000000 174     60      100M    =       474     400     AGGGGCGGGGGGACTGACCGCCAGCTATTCAGTGAGTAAAGGGGAACCCTTCTTAGGTGCGCGTGTGTAAGAGAGCGTGCGGGTATAAGGGATGCTACTT    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ     NM:i:0  MD:Z:100        AS:i:100        XS:i:0
+
+# view header
+samtools view -H aln.bam
+@HD     VN:1.5  SO:coordinate
+@SQ     SN:1000000      LN:1000000
+@PG     ID:bwa  PN:bwa  VN:0.7.15-r1142-dirty   CL:bwa/bwa mem sequence/ref.fa sequence/l100_n10000_d300_31_1.fq sequence/l100_n10000_d300_31_2.fq
+
+# substitute header with new name
+samtools view -H aln.bam | sed 's/SN:1000000/SN:my_ref/' > my_header
+
+# check out new bam file
+samtools reheader my_header aln.bam | samtools view | head -2
+6125:151        99      my_ref  151     60      100M    =       451     400     TAGTTCTAAGCGGCGAGTACCTAAGGGGCGGGGGGACTGACCGCCAGCTATTCAGTGAGTAAAGGGGAACCCTTCTTAGGTGCGCGTGTGTAAGAGAGCG    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ     NM:i:0  MD:Z:100        AS:i:100        XS:i:0
+9336:174        99      my_ref  174     60      100M    =       474     400     AGGGGCGGGGGGACTGACCGCCAGCTATTCAGTGAGTAAAGGGGAACCCTTCTTAGGTGCGCGTGTGTAAGAGAGCGTGCGGGTATAAGGGATGCTACTT    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ     NM:i:0  MD:Z:100        AS:i:100        XS:i:0
+
+# save bam file with new ref
+samtools reheader my_header aln.bam > aln_my_ref.bam
+```
 
 # Coverage
 
