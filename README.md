@@ -1,531 +1,495 @@
+
 Table of Contents
 =================
 
-   * [Table of Contents](#table-of-contents)
    * [Introduction](#introduction)
    * [Installing SAMtools](#installing-samtools)
    * [Basic usage](#basic-usage)
    * [Viewing](#viewing)
    * [Converting a SAM file to a BAM file](#converting-a-sam-file-to-a-bam-file)
    * [Converting a BAM file to a CRAM file](#converting-a-bam-file-to-a-cram-file)
-   * [Sorting a BAM file](#sorting-a-bam-file)
-   * [Converting SAM directly to a sorted BAM file](#converting-sam-directly-to-a-sorted-bam-file)
+   * [Sorting a SAM/BAM file](#sorting-a-sambam-file)
    * [Creating a BAM index file](#creating-a-bam-index-file)
-   * [Converting a BAM file to a SAM file](#converting-a-bam-file-to-a-sam-file)
-   * [Filtering out unmapped reads in BAM files](#filtering-out-unmapped-reads-in-bam-files)
-   * [Extracting SAM entries mapping to a specific loci](#extracting-sam-entries-mapping-to-a-specific-loci)
+   * [Filtering unmapped reads](#filtering-unmapped-reads)
+   * [Extracting entries mapping to a specific loci](#extracting-entries-mapping-to-a-specific-loci)
    * [Extracting only the first read from paired end BAM files](#extracting-only-the-first-read-from-paired-end-bam-files)
    * [Stats](#stats)
    * [Interpreting the BAM flags](#interpreting-the-bam-flags)
    * [samtools calmd/fillmd](#samtools-calmdfillmd)
    * [Creating fastq files from a BAM file](#creating-fastq-files-from-a-bam-file)
    * [Random subsampling of BAM file](#random-subsampling-of-bam-file)
-   * [Fastest way to count number of reads](#fastest-way-to-count-number-of-reads)
+   * [Count number of reads](#count-number-of-reads)
    * [Obtaining genomic sequence](#obtaining-genomic-sequence)
    * [Comparing BAM files](#comparing-bam-files)
    * [Converting reference names](#converting-reference-names)
    * [Coverage](#coverage)
-   * [Docker](#docker)
    * [Stargazers over time](#stargazers-over-time)
 
 Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
-# Introduction
+Sat Jul  4 11:05:05 JST 2020
 
-One of my most popular pages on my website is my [SAMtools page](http://davetang.org/wiki/tiki-index.php?page=SAMTools), which I created back in 2011. Unfortunately I can no longer edit that page for technical reasons, so I have migrated the information here. My examples do not include the `-@` argument, which allows the extremely useful feature of multi-threading. This is a very useful feature given that BAM files can get rather huge these days. For the latest information, please refer to the [release notes](https://github.com/samtools/samtools/releases).
+Introduction
+============
 
-I have created an example SAM file to demonstrate the commands. The steps to create `aln.sam` are inside the `run.sh` script. The reads in the SAM file are created from a randomly generated reference sequence; typing `make` will run all the steps used to create the file.
+SAMtools provides various (sub)tools for manipulating alignments in the SAM/BAM format. The SAM (Sequence Alignment/Map) format (BAM is just the binary form of SAM) is currently the *de facto* standard for storing large nucleotide sequence alignments. If you are dealing with high-throughput sequencing data, at some point you will probably have to deal with SAM/BAM files, so familiarise yourself with them! For the latest information, please refer to the [release notes](https://github.com/samtools/samtools/releases).
 
-```bash
-git clone https://github.com/davetang/learning_bam_file.git
-cd learning_bam_file/
-make
+The examples below use the `ERR188273_chrX.bam` BAM file generated as per <https://github.com/davetang/rnaseq> using the HISAT2 + StringTie2 RNA-seq pipeline. This README is generated using the `create_readme.sh` script; if you want to generate this file yourself, make sure you have `samtools` (version &gt;1.9), `gh-md-toc`, R, and the R `rmarkdown` package installed and have downloaded the reference files as per <https://github.com/davetang/rnaseq>.
+
+Installing SAMtools
+===================
+
+For installing SAMtools, I recommend using the Bioconda [samtools](https://anaconda.org/bioconda/samtools) package. I also recommend using [Miniconda](https://docs.conda.io/en/latest/miniconda.html) instead of Anaconda. I wrote a [short introduction to Conda](https://davetang.github.io/reproducible_bioinformatics/conda.html) if you want to find learn more.
+
+Once you have installed Miniconda, it is easy to install SAMtools.
+
+``` bash
+conda install -c bioconda samtools
 ```
 
-SAMtools provides various tools for manipulating alignments in the SAM/BAM format. The SAM (Sequence Alignment/Map) format (BAM is just the binary form of SAM) is currently the _de facto_ standard for storing large nucleotide sequence alignments. If you are dealing with high-throughput sequencing data, at some point you will probably have to deal with SAM/BAM files, so familiarise yourself with them! All of the examples below, use the `aln.sam` example SAM file that I created.
+Basic usage
+===========
 
-# Installing SAMtools
+If you run SAMtools on the terminal without any parameters or with `--help`, all the available utilities are listed:
 
-Just copy and paste the code below.
-
-```bash
-wget https://github.com/samtools/htslib/releases/download/1.7/htslib-1.7.tar.bz2
-tar -xjf htslib-1.7.tar.bz2
-cd htslib-1.7
-make
-make prefix=. install
-cd ..
-
-wget https://github.com/samtools/samtools/releases/download/1.7/samtools-1.7.tar.bz2
-tar -xjf samtools-1.7.tar.bz2
-cd samtools-1.7
-make
-make prefix=. install
-cd ..
+``` bash
+samtools --help
 ```
 
-# Basic usage
+    ## 
+    ## Program: samtools (Tools for alignments in the SAM format)
+    ## Version: 1.9 (using htslib 1.9)
+    ## 
+    ## Usage:   samtools <command> [options]
+    ## 
+    ## Commands:
+    ##   -- Indexing
+    ##      dict           create a sequence dictionary file
+    ##      faidx          index/extract FASTA
+    ##      fqidx          index/extract FASTQ
+    ##      index          index alignment
+    ## 
+    ##   -- Editing
+    ##      calmd          recalculate MD/NM tags and '=' bases
+    ##      fixmate        fix mate information
+    ##      reheader       replace BAM header
+    ##      targetcut      cut fosmid regions (for fosmid pool only)
+    ##      addreplacerg   adds or replaces RG tags
+    ##      markdup        mark duplicates
+    ## 
+    ##   -- File operations
+    ##      collate        shuffle and group alignments by name
+    ##      cat            concatenate BAMs
+    ##      merge          merge sorted alignments
+    ##      mpileup        multi-way pileup
+    ##      sort           sort alignment file
+    ##      split          splits a file by read group
+    ##      quickcheck     quickly check if SAM/BAM/CRAM file appears intact
+    ##      fastq          converts a BAM to a FASTQ
+    ##      fasta          converts a BAM to a FASTA
+    ## 
+    ##   -- Statistics
+    ##      bedcov         read depth per BED region
+    ##      depth          compute the depth
+    ##      flagstat       simple stats
+    ##      idxstats       BAM index stats
+    ##      phase          phase heterozygotes
+    ##      stats          generate stats (former bamcheck)
+    ## 
+    ##   -- Viewing
+    ##      flags          explain BAM flags
+    ##      tview          text alignment viewer
+    ##      view           SAM<->BAM<->CRAM conversion
+    ##      depad          convert padded BAM to unpadded BAM
 
-If you run SAMtools on the terminal without any parameters, all the available utilities are listed:
-
-```bash
-samtools
-
-Program: samtools (Tools for alignments in the SAM format)
-Version: 1.7 (using htslib 1.7)
-
-Usage:   samtools <command> [options]
-
-Commands:
-  -- Indexing
-     dict           create a sequence dictionary file
-     faidx          index/extract FASTA
-     index          index alignment
-
-  -- Editing
-     calmd          recalculate MD/NM tags and '=' bases
-     fixmate        fix mate information
-     reheader       replace BAM header
-     targetcut      cut fosmid regions (for fosmid pool only)
-     addreplacerg   adds or replaces RG tags
-     markdup        mark duplicates
-
-  -- File operations
-     collate        shuffle and group alignments by name
-     cat            concatenate BAMs
-     merge          merge sorted alignments
-     mpileup        multi-way pileup
-     sort           sort alignment file
-     split          splits a file by read group
-     quickcheck     quickly check if SAM/BAM/CRAM file appears intact
-     fastq          converts a BAM to a FASTQ
-     fasta          converts a BAM to a FASTA
-
-  -- Statistics
-     bedcov         read depth per BED region
-     depth          compute the depth
-     flagstat       simple stats
-     idxstats       BAM index stats
-     phase          phase heterozygotes
-     stats          generate stats (former bamcheck)
-
-  -- Viewing
-     flags          explain BAM flags
-     tview          text alignment viewer
-     view           SAM<->BAM<->CRAM conversion
-     depad          convert padded BAM to unpadded BAM
-
-```
-
-# Viewing
+Viewing
+=======
 
 Use [bioSyntax](https://github.com/bioSyntax/bioSyntax) to prettify your output.
 
-```bash
+``` bash
 samtools view aln.bam | sam-less
 ```
 
 ![bioSyntax](img/sam_less.png)
 
-# Converting a SAM file to a BAM file
+Converting a SAM file to a BAM file
+===================================
 
-A BAM file is just a SAM file but stored in binary; you should always convert your SAM files into BAM to save storage space and BAM files are faster to manipulate.
+A BAM file is just a SAM file but stored in binary format; you should always convert your SAM files into BAM as BAM files are smaller in size and are faster to manipulate.
 
-To get started, view the first couple of lines of your SAM file by typing on the terminal:
+Since I don't have a SAM file in the example folder, let's first create one and check out the first ten lines. Note: remember to use `-h` to ensure the SAM file contains the sequence header information. Generally, I recommend storing only sorted BAM files as they use less disk space and are faster to process.
 
-```bash
-head aln.sam 
-@SQ     SN:1000000      LN:1000000
-@PG     ID:bwa  PN:bwa  VN:0.7.13-r1126 CL:bwa/bwa mem sequence/ref.fa sequence/l100_n10000_d300_31_1.fq sequence/l100_n10000_d300_31_2.fq
-1:165617        99      1000000 165617  60      100M    =       165917  400     TGCAGTGGTATCGGATCAGCCTAGATGCCATAGCTGAGCGCCAAATTTCCGGATTTTCCCCGTGTAGTCAATGGAGCTGTTACTTTAAGCCGTGAATGTG    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ    NM:i:0  MD:Z:100        AS:i:100        XS:i:0
-1:165617        147     1000000 165917  60      100M    =       165617  -400    AATTCGATATGCCGGTCATCGTGTGTCTATGATACTCCTTAGGCATCCCTTTAACTACGATACTTTAAGAGGTGCGAAAAGTATTCTATACGGCAGCGTA    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ    NM:i:0  MD:Z:100        AS:i:100        XS:i:0
-2:591911        99      1000000 591911  60      100M    =       592211  400     GATCAAGCTGGGCATGGGTTCGGTGACGCGTAAAAAAATTTTTTTCTGAGGACCACTGAGAAGATGGTTACGTCTAGGATCTAAGACCTAGTGTCAACTC    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ    NM:i:0  MD:Z:100        AS:i:100        XS:i:0
-2:591911        147     1000000 592211  60      100M    =       591911  -400    GCATGACACTGGATAGTGCGATTAGATAGCGGCTCGGGAGTACGTCACTGAAAGTCCAGTGCGAGAGCCAACCCGGAAACTCTACATGCGCATGTAGAAC    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ    NM:i:0  MD:Z:100        AS:i:100        XS:i:0
-3:987691        99      1000000 987691  60      100M    =       987991  400     CTCGGGACTATCTGTCAAACACTAGGGCTTGGCATAACATCTCTGAATAATAGCCAACGCGCGAGGTGTACGGGAAAAAGGAGGACCACCGCGTTATCAC    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ    NM:i:0  MD:Z:100        AS:i:100        XS:i:0
-3:987691        147     1000000 987991  60      100M    =       987691  -400    ACCGACTCGCAATTATCTCGTATCCGGGAAACTGTATAGCCGGGGGAAACTCCGATACGGACCGGCATTGGTACCAAGCGTCGAGTAGATTACCACCGAC    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ    NM:i:0  MD:Z:100        AS:i:100        XS:i:0
-4:301460        99      1000000 301460  60      100M    =       301760  400     GGACGTATACCTACTCGCCCAATTCGATCAGTGGTATCTAGTTAAGAAATAGTCTTCCTCAATTTGACTCGCCTCAACGGTTGTCTATCTGAGCTGGAAT    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ    NM:i:0  MD:Z:100        AS:i:100        XS:i:0
-4:301460        147     1000000 301760  60      100M    =       301460  -400    GTGTAGACAGGGCCATACTACTAACATCTCACAGATTAGGTTCATGTCCTCTCTAGCTCGCCAGCGCGGCTACATTTGGACTTGATACCGTTACAACGGT    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ    NM:i:0  MD:Z:100        AS:i:100        XS:i:0
+``` bash
+samtools view -h eg/ERR188273_chrX.bam > eg/ERR188273_chrX.sam
 ```
 
-The lines starting with the "@" sign contains the header information. The @SQ tag is the reference sequence dictionary; SN refers to the reference sequence name and LN refers to the reference sequence length. If you don't see lines starting with the "@" sign, the header information is most likely missing. If the header is absent from the SAM file use the command below, where ref.fa is the reference fasta file used to map the reads:
+First notice that the SAM file is much larger than the BAM file.
 
-```bash
+``` bash
+ls -lh eg/ERR188273_chrX.bam eg/ERR188273_chrX.sam
+```
+
+    ## -rw-r--r-- 1 davetang staff  67M Jun 28 20:26 eg/ERR188273_chrX.bam
+    ## -rw-r--r-- 1 davetang staff 321M Jul  4 11:03 eg/ERR188273_chrX.sam
+
+We can use `head` to view a SAM file.
+
+``` bash
+head eg/ERR188273_chrX.sam
+```
+
+    ## @HD  VN:1.0  SO:coordinate
+    ## @SQ  SN:chrX LN:156040895
+    ## @PG  ID:hisat2   PN:hisat2   VN:2.2.0    CL:"/Users/dtang/github/rnaseq/hisat2/../src/hisat2-2.2.0/hisat2-align-s --wrapper basic-0 --dta -p 4 -x ../raw/chrX_data/indexes/chrX_tran -1 /tmp/4195.inpipe1 -2 /tmp/4195.inpipe2"
+    ## ERR188273.4711308    73  chrX    21649   0   5S70M   =   21649   0   CGGGTGATCACGAGGTCAGGAGATCAAGACCATCCTGGCCAACACAGTGAAACCCCATCTCTACTAAAAATACAA @@@F=DDFFHGHBHIFFHIGGIFGEGHFHIGIGIFIIIGIGIGGDHIIGIIC@>DGHCHHHGHHFFFFFDEACC@ AS:i:-5 ZS:i:-5 XN:i:0  XM:i:0  XO:i:0  XG:i:0  NM:i:0  MD:Z:70 YT:Z:UP NH:i:2
+    ## ERR188273.4711308    133 chrX    21649   0   *   =   21649   0   CTACAGGTGCCCGCCACCATGCCCAGCTAATTTTTTTTGTATTTTTAGTAGAGATGGGGTTTCACTGTGTTGGCC CB@FDFFFHHGFHIJJJJIIIIIIIGGGIJGIIJJJJJJFFHIIIIGECHEHHGGHHFF?AACCDDDDDDDDBCD YT:Z:UP
+    ## ERR188273.4711308    329 chrX    233717  0   5S70M   =   233717  0   CGGGTGATCACGAGGTCAGGAGATCAAGACCATCCTGGCCAACACAGTGAAACCCCATCTCTACTAAAAATACAA @@@F=DDFFHGHBHIFFHIGGIFGEGHFHIGIGIFIIIGIGIGGDHIIGIIC@>DGHCHHHGHHFFFFFDEACC@ AS:i:-5 ZS:i:-5 XN:i:0  XM:i:0  XO:i:0  XG:i:0  NM:i:0  MD:Z:70 YT:Z:UP NH:i:2
+    ## ERR188273.14904746   99  chrX    251271  60  75M =   251317  121 GAAAAATGGGCCCAGGGGACCGGCGCTCAGCATACAGAGGACCCGCGCCGGCACCTGCCTCTGAGTTCCCTTAGT @@<DDDDDFB>HHEGIIGAGIIIBGIIG@FECH<F@GIIFAE=?BCBBCBBB5@<?CBBCCCCAACDCCCCCCCC AS:i:0  XN:i:0  XM:i:0  XO:i:0  XG:i:0  NM:i:0  MD:Z:75 YS:i:-2 YT:Z:CP NH:i:1
+    ## ERR188273.14904746   147 chrX    251317  60  75M =   251271  -121    GCCGGCCCCTGCCTCTGAGTTCCCTTAGTACTTATTGATCATTATCGGGGAGAGGGGGATGTGGCAGGACAATAG #######B?DAHC@EGIIGGEHHGC@GFBFCEGFCIGG@EG@@H<JIEHEF@IGEHGHIIHFGHDDFDDDDD?<B AS:i:-2 ZS:i:-7 XN:i:0  XM:i:1  XO:i:0  XG:i:0  NM:i:1  MD:Z:6A68   YS:i:0  YT:Z:CP NH:i:1
+    ## ERR188273.5849805    163 chrX    265951  1   75M =   266022  146 CGGGTTCACGCCATTCTCCTGCCTCAGCCTCCCGAGTAGCTGGGACTACAGGCGCCCGCCACCACGCCCGGCTAA @CCFDFFFHHHHHJJJJJJFJJJJJIJIJJJJJJJJGHIJJJJJEHIJIJGIIJJJHHFFDDEDDDDDDDDDDDD AS:i:0  ZS:i:0  XN:i:0  XM:i:0  XO:i:0  XG:i:0  NM:i:0  MD:Z:75 YS:i:0  YT:Z:CP NH:i:2
+    ## ERR188273.1232356    369 chrX    265984  1   75M =   118343251   0   GAGTAGCTGGGACTACAGGCGCCCGCCACCACGCCCGGCTAATTTTTTGTATTTTTAGTAGAGACGGGGTTTCAC @@CA@B>DC>>+@::8-755-BBBFDDEHHBGGEGHEEIJIIGIJJIGEIIIJJJIIJJIGGHHHGGFFFFF@@C AS:i:0  ZS:i:0  XN:i:0  XM:i:0  XO:i:0  XG:i:0  NM:i:0  MD:Z:75 YT:Z:UP NH:i:10
+
+The lines starting with the "@" sign contains the header information. The @SQ tag is the reference sequence dictionary; SN refers to the reference sequence name and LN refers to the reference sequence length. If you don't see lines starting with the "@" sign, the header information is most likely missing. If the @SQ header is absent from the SAM file use the command below, where ref.fa is the reference fasta file used to map the reads, to generate @SQ information.
+
+``` bash
 samtools view -bT sequence/ref.fa aln.sam > aln.bam
 ```
 
-If the header information is available:
+If the header information is available, we can convert a SAM file into BAM by using `samtools view -b`. In the newer version of SAMtools the input format is autodetected, so we no longer need the `-S` parameter.
 
-```bash
-samtools view -bS aln.sam > aln.bam
-
-# in the newer version of SAMtools the input format is autodetected
-# hence we don't need the -S parameter any more
-samtools view -b aln.sam > aln.bam
+``` bash
+samtools view -b eg/ERR188273_chrX.sam > eg/my.bam
 ```
 
-# Converting a BAM file to a CRAM file
+Converting a BAM file to a CRAM file
+====================================
 
-The CRAM format saves you even more disk space; disk usage of SAM = 5.5M, unordered BAM = 978K, ordered BAM = 746K, and CRAM = 91K
+Use `samtools view` with the `-T` and `-C` arguments to convert a BAM file into CRAM.
 
-```bash
-samtools view -T sequence/ref.fa -C -o aln.cram aln.bam
+``` bash
+samtools view -T ~/github/rnaseq/raw/chrX_data/genome/chrX.fa -C -o eg/ERR188273_chrX.cram eg/ERR188273_chrX.bam
 
-ls -hl aln.sam
--rw-r--r-- 1 dtang dtang 5.5M Feb  9 16:55 aln.sam
-
-# unsorted BAM file
-ls -hl aln.bam
--rw-r--r-- 1 dtang dtang 978K Feb 10 16:49 aln.bam
-
-# sorted BAM file
-ls -hl aln.bam
--rw-r--r-- 1 dtang dtang 746K Feb 10 16:50 aln.bam
-
-# CRAM from sorted BAM file
-ls -hl aln.cram 
--rw-r--r-- 1 dtang dtang 91K Feb 10 16:52 aln.cram
+ls -lh eg/ERR188273_chrX.[sbcr]*am
 ```
+
+    ## -rw-r--r-- 1 davetang staff  67M Jun 28 20:26 eg/ERR188273_chrX.bam
+    ## -rw-r--r-- 1 davetang staff  41M Jul  4 11:04 eg/ERR188273_chrX.cram
+    ## -rw-r--r-- 1 davetang staff 321M Jul  4 11:03 eg/ERR188273_chrX.sam
+
+You can use `samtools view` to view a CRAM file.
+
+``` bash
+samtools view eg/ERR188273_chrX.cram | head
+```
+
+    ## ERR188273.4711308    73  chrX    21649   0   5S70M   =   21649   0   CGGGTGATCACGAGGTCAGGAGATCAAGACCATCCTGGCCAACACAGTGAAACCCCATCTCTACTAAAAATACAA @@@F=DDFFHGHBHIFFHIGGIFGEGHFHIGIGIFIIIGIGIGGDHIIGIIC@>DGHCHHHGHHFFFFFDEACC@ AS:i:-5 ZS:i:-5 XN:i:0  XM:i:0  XO:i:0  XG:i:0  YT:Z:UP NH:i:2  MD:Z:70 NM:i:0
+    ## ERR188273.4711308    133 chrX    21649   0   *   =   21649   0   CTACAGGTGCCCGCCACCATGCCCAGCTAATTTTTTTTGTATTTTTAGTAGAGATGGGGTTTCACTGTGTTGGCC CB@FDFFFHHGFHIJJJJIIIIIIIGGGIJGIIJJJJJJFFHIIIIGECHEHHGGHHFF?AACCDDDDDDDDBCD YT:Z:UP
+    ## ERR188273.4711308    329 chrX    233717  0   5S70M   =   233717  0   CGGGTGATCACGAGGTCAGGAGATCAAGACCATCCTGGCCAACACAGTGAAACCCCATCTCTACTAAAAATACAA @@@F=DDFFHGHBHIFFHIGGIFGEGHFHIGIGIFIIIGIGIGGDHIIGIIC@>DGHCHHHGHHFFFFFDEACC@ AS:i:-5 ZS:i:-5 XN:i:0  XM:i:0  XO:i:0  XG:i:0  YT:Z:UP NH:i:2  MD:Z:70 NM:i:0
+    ## ERR188273.14904746   99  chrX    251271  60  75M =   251317  121 GAAAAATGGGCCCAGGGGACCGGCGCTCAGCATACAGAGGACCCGCGCCGGCACCTGCCTCTGAGTTCCCTTAGT @@<DDDDDFB>HHEGIIGAGIIIBGIIG@FECH<F@GIIFAE=?BCBBCBBB5@<?CBBCCCCAACDCCCCCCCC AS:i:0  XN:i:0  XM:i:0  XO:i:0  XG:i:0  YS:i:-2 YT:Z:CP NH:i:1  MD:Z:75 NM:i:0
+    ## ERR188273.14904746   147 chrX    251317  60  75M =   251271  -121    GCCGGCCCCTGCCTCTGAGTTCCCTTAGTACTTATTGATCATTATCGGGGAGAGGGGGATGTGGCAGGACAATAG #######B?DAHC@EGIIGGEHHGC@GFBFCEGFCIGG@EG@@H<JIEHEF@IGEHGHIIHFGHDDFDDDDD?<B AS:i:-2 ZS:i:-7 XN:i:0  XM:i:1  XO:i:0  XG:i:0  YS:i:0  YT:Z:CP NH:i:1  MD:Z:6A68   NM:i:1
+    ## ERR188273.5849805    163 chrX    265951  1   75M =   266022  146 CGGGTTCACGCCATTCTCCTGCCTCAGCCTCCCGAGTAGCTGGGACTACAGGCGCCCGCCACCACGCCCGGCTAA @CCFDFFFHHHHHJJJJJJFJJJJJIJIJJJJJJJJGHIJJJJJEHIJIJGIIJJJHHFFDDEDDDDDDDDDDDD AS:i:0  ZS:i:0  XN:i:0  XM:i:0  XO:i:0  XG:i:0  YS:i:0  YT:Z:CP NH:i:2  MD:Z:75 NM:i:0
+    ## ERR188273.1232356    369 chrX    265984  1   75M =   118343251   0   GAGTAGCTGGGACTACAGGCGCCCGCCACCACGCCCGGCTAATTTTTTGTATTTTTAGTAGAGACGGGGTTTCAC @@CA@B>DC>>+@::8-755-BBBFDDEHHBGGEGHEEIJIIGIJJIGEIIIJJJIIJJIGGHHHGGFFFFF@@C AS:i:0  ZS:i:0  XN:i:0  XM:i:0  XO:i:0  XG:i:0  YT:Z:UP NH:i:10 MD:Z:75 NM:i:0
+    ## ERR188273.5927795    385 chrX    265991  1   75M =   114048277   0   TGGGACTACAGGCGCCCGCCACCACGCCCGGCTAATTTTTTGTATTTTTAGTAGAGACGGGGTTTCACCGTGTTA =?BB??BD?FBHHBEAE@CDGG@HH=FA@GEGE;FGACCHBE6?A=ACE9)7@DCE>>5'3=338:;:>2<AA?: AS:i:0  ZS:i:0  XN:i:0  XM:i:0  XO:i:0  XG:i:0  YT:Z:UP NH:i:10 MD:Z:75 NM:i:0
+    ## ERR188273.5849805    83  chrX    266022  1   75M =   265951  -146    CTAATTTTTTGTATTTTTAGTAGAGACGGGGTTTCACCGTGTTAGCCAGGATGGTGTCGATCTCCTGACCTCGTG DDDDDDDEEEEEDBFEDGHHHHHHJHIJJIGIGHFBJJIHGJJIIJJJJJJJJIGIJJJJJJHHHHHDFFFFCCB AS:i:0  ZS:i:0  XN:i:0  XM:i:0  XO:i:0  XG:i:0  YS:i:0  YT:Z:CP NH:i:2  MD:Z:75 NM:i:0
+    ## ERR188273.13655123   113 chrX    266022  1   75M =   118343234   0   CTAATTTTTTGTATTTTTAGTAGAGACGGGGTTTCACCGTGTTAGCCAGGATGGTGTCGATCTCCTGACCTCGTG AACBBBACCCC>;3?BCFFEEHHHEEGIGGHAGFBBHFBHHEHCG@<@ABG??@@?BB9GBGAFFD<<DDAD@@@ AS:i:0  ZS:i:0  XN:i:0  XM:i:0  XO:i:0  XG:i:0  YT:Z:UP NH:i:2  MD:Z:75 NM:i:0
 
 I have an [old blog post](https://davetang.org/muse/2014/09/26/bam-to-cram/) on the CRAM format.
 
-# Sorting a BAM file
+Sorting a SAM/BAM file
+======================
 
-Always sort your BAM files; many downstream programs only take sorted BAM files.
+Always sort your SAM/BAM files; many downstream programs only take sorted BAM files. In SAMtools version 1.3 or newer, you can sort a SAM file directly.
 
-```bash
-samtools sort aln.bam -o aln.bam
+``` bash
+samtools sort eg/ERR188273_chrX.sam -o eg/sorted.bam
 ```
 
-# Converting SAM directly to a sorted BAM file
+You should use use additional threads by specifying `-@ 4` (using 4 threads) to speed up sorting.
 
-Like many Unix tools, SAMtools is able to read directly from a stream i.e. stdout.
-
-```bash
-samtools view -bS aln.sam | samtools sort - -o aln.bam
+``` bash
+time samtools sort eg/ERR188273_chrX.sam -o eg/sorted.bam
+time samtools sort -@ 4 eg/ERR188273_chrX.sam -o eg/sorted.bam
 ```
 
-In SAMtools version 1.3 or newer, you can sort a SAM file directly.
+    ## 
+    ## real 0m5.486s
+    ## user 0m5.139s
+    ## sys  0m0.264s
+    ## [bam_sort_core] merging from 0 files and 4 in-memory blocks...
+    ## 
+    ## real 0m3.423s
+    ## user 0m8.259s
+    ## sys  0m0.369s
 
-```bash
-samtools sort -o aln.bam aln.sam
+Creating a BAM index file
+=========================
+
+Various tools require BAM index files, such as IGV, which is a program for visualising a BAM file.
+
+``` bash
+samtools index eg/ERR188273_chrX.bam
 ```
 
-In addition, you should use use additional threads, if they are available, to speed up sorting.
+Filtering unmapped reads
+========================
 
-```bash
-samtools sort -@ 8 -o aln.bam aln.sam
-```
+Use `-F 4` to filter out unmapped reads. Use the `flags` subcommand to find out what a flag represents.
 
-# Creating a BAM index file
-
-A BAM index file is usually needed when visualising a BAM file.
-
-```bash
-samtools index aln.bam
-```
-
-# Converting a BAM file to a SAM file
-
-Note: remember to use -h to ensure the converted SAM file contains the header information. Generally, I recommend storing only sorted BAM files as they use much less disk space and are faster to process.
-
-```bash
-samtools view -h aln.bam > aln2.sam
-```
-
-# Filtering out unmapped reads in BAM files
-
-```bash
-samtools view -h -F 4 aln.bam > aln_only_mapped.sam
-
-# output back to BAM
-samtools view -h -F 4 -b aln.bam > aln_only_mapped.bam
-
-# in the newer version of SAMtools there is the flags subcommand
-# which will tell you what the flags are
+``` bash
 samtools flags 4
-0x4     4       UNMAP
+samtools view -F 4 -b eg/ERR188273_chrX.bam > eg/ERR188273_chrX.mapped.bam
 ```
 
-# Extracting SAM entries mapping to a specific loci
+    ## 0x4  4   UNMAP
 
-If we want all reads mapping within a specific genomic region, we can use `samtools view` and the `ref:start-end` syntax. The name of the reference sequence in my example SAM file is 1000000. You can use just the `ref` to extract an entire reference sequence such as a chromosome (example not shown here).
+Use `-f 4` to keep only unmapped reads.
 
-```bash
-# index the bam file first
-samtools index aln.bam
+``` bash
+samtools view -f 4 -b eg/ERR188273_chrX.bam > eg/ERR188273_chrX.unmapped.bam
+```
 
-# reads mapping in the region 1000 to 1300
-samtools view aln.bam 1000000:1000-1300
-6144:733        147     1000000 1033    60      100M    =       733     -400    CCCTCCGGGGAGGGGATCTATTAGGAAAGATTCGAGTCGGTACGTTGTATGGAACGGTTAGCACCGCCATATATCAGATTCAAAATTATCTAGGGTTTCA    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ    NM:i:0  MD:Z:100        AS:i:100        XS:i:0
-7897:1206       99      1000000 1206    60      100M    =       1506    400     TTGCCGTGTACTGGTTGAGCCATACGCAAAATTGGGATCACATTTGTATTGACGCAGGAAAACTGATGCCCGTATCTCCAGAGGTACCAGAGCGACCTGG    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ    NM:i:0  MD:Z:100        AS:i:100        XS:i:0
-9588:1278       99      1000000 1278    60      100M    =       1578    400     TATCTCCAGAGGTACCAGAGCGACCTGGACTTCAGCCAGGGAGATAGAGTATCACACTGAAGGACGGTAGCCGATAGATGAGCTGGACCTTGGATCTACT    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ    NM:i:0  MD:Z:100        AS:i:100        XS:i:0
+Extracting entries mapping to a specific loci
+=============================================
 
-# note that this takes into account the mapping of the entire read and not just the starting position
-samtools view aln.bam 1000000:1250-1300
-7897:1206       99      1000000 1206    60      100M    =       1506    400     TTGCCGTGTACTGGTTGAGCCATACGCAAAATTGGGATCACATTTGTATTGACGCAGGAAAACTGATGCCCGTATCTCCAGAGGTACCAGAGCGACCTGG    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ     NM:i:0  MD:Z:100        AS:i:100        XS:i:0
-9588:1278       99      1000000 1278    60      100M    =       1578    400     TATCTCCAGAGGTACCAGAGCGACCTGGACTTCAGCCAGGGAGATAGAGTATCACACTGAAGGACGGTAGCCGATAGATGAGCTGGACCTTGGATCTACT    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ     NM:i:0  MD:Z:100        AS:i:100        XS:i:0
+If we want all reads mapping within a specific genomic region, we can use `samtools view` and the `ref:start-end` syntax. You can use just the `ref` to extract an entire reference sequence such as a chromosome (example not shown here). This requires a BAM index file.
 
-# all reads mapping on 1000000 between 1000 to 1300 saved to another BAM file
-samtools view -b aln.bam 1000000:1000-1300 > aln_1000_1300.bam
+``` bash
+samtools view eg/ERR188273_chrX.bam chrX:20000-30000
+```
+
+    ## ERR188273.4711308    73  chrX    21649   0   5S70M   =   21649   0   CGGGTGATCACGAGGTCAGGAGATCAAGACCATCCTGGCCAACACAGTGAAACCCCATCTCTACTAAAAATACAA @@@F=DDFFHGHBHIFFHIGGIFGEGHFHIGIGIFIIIGIGIGGDHIIGIIC@>DGHCHHHGHHFFFFFDEACC@ AS:i:-5 ZS:i:-5 XN:i:0  XM:i:0  XO:i:0  XG:i:0  NM:i:0  MD:Z:70 YT:Z:UP NH:i:2
+    ## ERR188273.4711308    133 chrX    21649   0   *   =   21649   0   CTACAGGTGCCCGCCACCATGCCCAGCTAATTTTTTTTGTATTTTTAGTAGAGATGGGGTTTCACTGTGTTGGCC CB@FDFFFHHGFHIJJJJIIIIIIIGGGIJGIIJJJJJJFFHIIIIGECHEHHGGHHFF?AACCDDDDDDDDBCD YT:Z:UP
+
+Note that this takes into account the mapping of the entire read and not just the starting position. For example, if you specified chrX:20000-30000, a read that is 75 bp long that maps to position 19999 will also be returned. You can save the output as another BAM file if you wish.
+
+``` bash
+samtools view -b eg/ERR188273_chrX.bam chrX:20000-30000 > eg/ERR188273_chrX_20000_30000.bam
 ```
 
 You can also use a BED file, with several entries, to extract reads of interest.
 
-```bash
-cat my.bed 
-1000000 1000    1300
-1000000 2000    2300
+``` bash
+cat eg/my.bed 
 
-samtools view -L my.bed aln.bam
-6144:733        147     1000000 1033    60      100M    =       733     -400    CCCTCCGGGGAGGGGATCTATTAGGAAAGATTCGAGTCGGTACGTTGTATGGAACGGTTAGCACCGCCATATATCAGATTCAAAATTATCTAGGGTTTCA    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ  NM:i:0  MD:Z:100        AS:i:100        XS:i:0
-7897:1206       99      1000000 1206    60      100M    =       1506    400     TTGCCGTGTACTGGTTGAGCCATACGCAAAATTGGGATCACATTTGTATTGACGCAGGAAAACTGATGCCCGTATCTCCAGAGGTACCAGAGCGACCTGG    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ  NM:i:0  MD:Z:100        AS:i:100        XS:i:0
-9588:1278       99      1000000 1278    60      100M    =       1578    400     TATCTCCAGAGGTACCAGAGCGACCTGGACTTCAGCCAGGGAGATAGAGTATCACACTGAAGGACGGTAGCCGATAGATGAGCTGGACCTTGGATCTACT    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ  NM:i:0  MD:Z:100        AS:i:100        XS:i:0
-10:1630 147     1000000 1930    60      100M    =       1630    -400    CCACCCACTACAGTAAATGAGAGAAAACGGATTAAGGTTCTAACCCTTAGCGATGACCGTTCTCACGGGTGTCTAGATACCGAGTAGAACCAACCAGCAC    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ  NM:i:0  MD:Z:100        AS:i:100        XS:i:0
-9137:1657       147     1000000 1957    60      100M    =       1657    -400    CGGATTAAGGTTCTAACCCTTAGCGATGACCGTTCTCACGGGTGTCTAGATACCGAGTAGAACCAACCAGCACCCAGCATTAAACCACAGAAGCACCGTT    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ  NM:i:0  MD:Z:100        AS:i:100        XS:i:0
-5893:1667       147     1000000 1967    60      100M    =       1667    -400    TTCTAACCCTTAGCGATGACCGTTCTCACGGGTGTCTAGATACCGAGTAGAACCAACCAGCACCCAGCATTAAACCACAGAAGCACCGTTGGTTTCTTTA    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ  NM:i:0  MD:Z:100        AS:i:100        XS:i:0
-3617:1997       99      1000000 1997    60      100M    =       2297    400     GGTGTCTAGATACCGAGTAGAACCAACCAGCACCCAGCATTAAACCACAGAAGCACCGTTGGTTTCTTTAATAGCTTCAACGCCGGCCATATCAATAAAA    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ  NM:i:0  MD:Z:100        AS:i:100        XS:i:0
-5736:1773       147     1000000 2073    60      100M    =       1773    -400    TCAACGCCGGCCATATCAATAAAAGGCTGTCGCCACATCCGTGGGTGCAAACTGAGCAGCCATGAACCTGGAAACGTTGTAGCCATGAAGATAATGCATA    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ  NM:i:0  MD:Z:100        AS:i:100        XS:i:0
-3123:2230       99      1000000 2230    60      100M    =       2530    400     CGGCACGTGCTGTCAGTATATAGTGTCGCTCATCAGGGAGGTACACCACGCGGTGGAGCATCCACGCTTTTCCCCATCTTCTATTACCTCGGCGGGGAAA    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ  NM:i:0  MD:Z:100        AS:i:100        XS:i:0
-4758:2263       99      1000000 2263    60      100M    =       2563    400     CAGGGAGGTACACCACGCGGTGGAGCATCCACGCTTTTCCCCATCTTCTATTACCTCGGCGGGGAAACAGGTAGATATGGGGGTTGGCTTGTGCAAGATA    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ  NM:i:0  MD:Z:100        AS:i:100        XS:i:0
-3617:1997       147     1000000 2297    60      100M    =       1997    -400    TTTTCCCCATCTTCTATTACCTCGGCGGGGAAACAGGTAGATATGGGGGTTGGCTTGTGCAAGATACAATTCGATAGTTGCGGGGGCTTAGATCGGCGTG    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ  NM:i:0  MD:Z:100        AS:i:100        XS:i:0
+samtools view -L eg/my.bed eg/ERR188273_chrX.bam
 ```
 
-# Extracting only the first read from paired end BAM files
+    ## chrX 20000   30000
+    ## chrX 233000  260000
+    ## ERR188273.4711308    73  chrX    21649   0   5S70M   =   21649   0   CGGGTGATCACGAGGTCAGGAGATCAAGACCATCCTGGCCAACACAGTGAAACCCCATCTCTACTAAAAATACAA @@@F=DDFFHGHBHIFFHIGGIFGEGHFHIGIGIFIIIGIGIGGDHIIGIIC@>DGHCHHHGHHFFFFFDEACC@ AS:i:-5 ZS:i:-5 XN:i:0  XM:i:0  XO:i:0  XG:i:0  NM:i:0  MD:Z:70 YT:Z:UP NH:i:2
+    ## ERR188273.4711308    133 chrX    21649   0   *   =   21649   0   CTACAGGTGCCCGCCACCATGCCCAGCTAATTTTTTTTGTATTTTTAGTAGAGATGGGGTTTCACTGTGTTGGCC CB@FDFFFHHGFHIJJJJIIIIIIIGGGIJGIIJJJJJJFFHIIIIGECHEHHGGHHFF?AACCDDDDDDDDBCD YT:Z:UP
+    ## ERR188273.4711308    329 chrX    233717  0   5S70M   =   233717  0   CGGGTGATCACGAGGTCAGGAGATCAAGACCATCCTGGCCAACACAGTGAAACCCCATCTCTACTAAAAATACAA @@@F=DDFFHGHBHIFFHIGGIFGEGHFHIGIGIFIIIGIGIGGDHIIGIIC@>DGHCHHHGHHFFFFFDEACC@ AS:i:-5 ZS:i:-5 XN:i:0  XM:i:0  XO:i:0  XG:i:0  NM:i:0  MD:Z:70 YT:Z:UP NH:i:2
+    ## ERR188273.14904746   99  chrX    251271  60  75M =   251317  121 GAAAAATGGGCCCAGGGGACCGGCGCTCAGCATACAGAGGACCCGCGCCGGCACCTGCCTCTGAGTTCCCTTAGT @@<DDDDDFB>HHEGIIGAGIIIBGIIG@FECH<F@GIIFAE=?BCBBCBBB5@<?CBBCCCCAACDCCCCCCCC AS:i:0  XN:i:0  XM:i:0  XO:i:0  XG:i:0  NM:i:0  MD:Z:75 YS:i:-2 YT:Z:CP NH:i:1
+    ## ERR188273.14904746   147 chrX    251317  60  75M =   251271  -121    GCCGGCCCCTGCCTCTGAGTTCCCTTAGTACTTATTGATCATTATCGGGGAGAGGGGGATGTGGCAGGACAATAG #######B?DAHC@EGIIGGEHHGC@GFBFCEGFCIGG@EG@@H<JIEHEF@IGEHGHIIHFGHDDFDDDDD?<B AS:i:-2 ZS:i:-7 XN:i:0  XM:i:1  XO:i:0  XG:i:0  NM:i:1  MD:Z:6A68   YS:i:0  YT:Z:CP NH:i:1
 
-Sometimes you only want the first pair of a mate.
+Extracting only the first read from paired end BAM files
+========================================================
 
-```bash
-samtools view -h -f 0x0040 aln.bam > aln_first_pair.sam
+Sometimes you only want the first pair of a mate. 0x0040 is hexadecimal for 64 (i.e. 16 \* 4), which is binary for 1000000, corresponding to the read in the first read pair.
+
+``` bash
+samtools view -b -f 0x0040 eg/ERR188273_chrX.bam > eg/first.bam
 ```
 
-0x0040 is hexadecimal for 64 (i.e. 16 * 4), which is binary for 1000000, corresponding to the read in the first read pair.
-
-# Stats
+Stats
+=====
 
 For simple statistics use `samtools flagstat`.
 
-```bash
-samtools flagstat aln.bam
-20000 + 0 in total (QC-passed reads + QC-failed reads)
-0 + 0 secondary
-0 + 0 supplementary
-0 + 0 duplicates
-20000 + 0 mapped (100.00% : N/A)
-20000 + 0 paired in sequencing
-10000 + 0 read1
-10000 + 0 read2
-20000 + 0 properly paired (100.00% : N/A)
-20000 + 0 with itself and mate mapped
-0 + 0 singletons (0.00% : N/A)
-0 + 0 with mate mapped to a different chr
-0 + 0 with mate mapped to a different chr (mapQ>=5)
+``` bash
+samtools flagstat eg/ERR188273_chrX.bam
 ```
 
-For more stats, use `samtools stats`.
+    ## 1176360 + 0 in total (QC-passed reads + QC-failed reads)
+    ## 16276 + 0 secondary
+    ## 0 + 0 supplementary
+    ## 0 + 0 duplicates
+    ## 1126961 + 0 mapped (95.80% : N/A)
+    ## 1160084 + 0 paired in sequencing
+    ## 580042 + 0 read1
+    ## 580042 + 0 read2
+    ## 1060858 + 0 properly paired (91.45% : N/A)
+    ## 1065618 + 0 with itself and mate mapped
+    ## 45067 + 0 singletons (3.88% : N/A)
+    ## 0 + 0 with mate mapped to a different chr
+    ## 0 + 0 with mate mapped to a different chr (mapQ>=5)
 
-```bash
-samtools stats aln.bam | grep ^SN
-SN      raw total sequences:    20000
-SN      filtered sequences:     0
-SN      sequences:      20000
-SN      is sorted:      1
-SN      1st fragments:  10000
-SN      last fragments: 10000
-SN      reads mapped:   20000
-SN      reads mapped and paired:        20000   # paired-end technology bit set + both mates mapped
-SN      reads unmapped: 0
-SN      reads properly paired:  20000   # proper-pair bit set
-SN      reads paired:   20000   # paired-end technology bit set
-SN      reads duplicated:       0       # PCR or optical duplicate bit set
-SN      reads MQ0:      0       # mapped and MQ=0
-SN      reads QC failed:        0
-SN      non-primary alignments: 0
-SN      total length:   2000000 # ignores clipping
-SN      bases mapped:   2000000 # ignores clipping
-SN      bases mapped (cigar):   2000000 # more accurate
-SN      bases trimmed:  0
-SN      bases duplicated:       0
-SN      mismatches:     0       # from NM fields
-SN      error rate:     0.000000e+00    # mismatches / bases mapped (cigar)
-SN      average length: 100
-SN      maximum length: 100
-SN      average quality:        41.0
-SN      insert size average:    400.0
-SN      insert size standard deviation: 0.0
-SN      inward oriented pairs:  10000
-SN      outward oriented pairs: 0
-SN      pairs with other orientation:   0
-SN      pairs on different chromosomes: 0
+For additional stats, use `samtools stats`.
+
+``` bash
+samtools stats eg/ERR188273_chrX.bam | grep ^SN
 ```
 
-In addition, you can create plots from the `samtools stats` output using `plot-bamstats`; you need to have `gnuplot` installed though. `plot-bamstats` is located in the `misc` directory where you downloaded `samtools`.
+    ## SN   raw total sequences:    1160084
+    ## SN   filtered sequences: 0
+    ## SN   sequences:  1160084
+    ## SN   is sorted:  1
+    ## SN   1st fragments:  580042
+    ## SN   last fragments: 580042
+    ## SN   reads mapped:   1110685
+    ## SN   reads mapped and paired:    1065618 # paired-end technology bit set + both mates mapped
+    ## SN   reads unmapped: 49399
+    ## SN   reads properly paired:  1060858 # proper-pair bit set
+    ## SN   reads paired:   1160084 # paired-end technology bit set
+    ## SN   reads duplicated:   0   # PCR or optical duplicate bit set
+    ## SN   reads MQ0:  905 # mapped and MQ=0
+    ## SN   reads QC failed:    0
+    ## SN   non-primary alignments: 16276
+    ## SN   total length:   87006300    # ignores clipping
+    ## SN   total first fragment length:    43503150    # ignores clipping
+    ## SN   total last fragment length: 43503150    # ignores clipping
+    ## SN   bases mapped:   83301375    # ignores clipping
+    ## SN   bases mapped (cigar):   83064942    # more accurate
+    ## SN   bases trimmed:  0
+    ## SN   bases duplicated:   0
+    ## SN   mismatches: 423271  # from NM fields
+    ## SN   error rate: 5.095663e-03    # mismatches / bases mapped (cigar)
+    ## SN   average length: 75
+    ## SN   average first fragment length:  75
+    ## SN   average last fragment length:   75
+    ## SN   maximum length: 75
+    ## SN   maximum first fragment length:  75
+    ## SN   maximum last fragment length:   75
+    ## SN   average quality:    36.0
+    ## SN   insert size average:    182.7
+    ## SN   insert size standard deviation: 176.0
+    ## SN   inward oriented pairs:  530763
+    ## SN   outward oriented pairs: 1042
+    ## SN   pairs with other orientation:   1004
+    ## SN   pairs on different chromosomes: 0
+    ## SN   percentage of properly paired reads (%):    91.4
 
-```bash
-samtools stats aln.bam > aln.stat
-
-~/src/samtools-1.6/misc/plot-bamstats -p out/ aln.stat
-
-ls -1 out
-acgt-cycles.gp
-acgt-cycles.png
-coverage.gp
-coverage.png
-gc-content.gp
-gc-content.png
-gc-depth.gp
-gc-depth.png
-index.html
-insert-size.gp
-insert-size.png
-quals-hm.gp
-quals-hm.png
-quals.gp
-quals.png
-quals2.gp
-quals2.png
-quals3.gp
-quals3.png
-```
-
-# Interpreting the BAM flags
+Interpreting the BAM flags
+==========================
 
 The second column in a SAM/BAM file is the flag column. They may seem confusing at first but the encoding allows details about a read to be stored by just using a few digits. The trick is to convert the numerical digit into binary, and then use the table to interpret the binary numbers, where 1 = true and 0 = false. I wrote a blog post on BAM flags: <http://davetang.org/muse/2014/03/06/understanding-bam-flags/>, which also includes a Perl script for interpreting BAM flags. There is also the `flags` subcommand.
 
-```bash
+``` bash
 samtools flags
-
-About: Convert between textual and numeric flag representation
-Usage: samtools flags INT|STR[,...]
-
-Flags:
-        0x1     PAIRED        .. paired-end (or multiple-segment) sequencing technology
-        0x2     PROPER_PAIR   .. each segment properly aligned according to the aligner
-        0x4     UNMAP         .. segment unmapped
-        0x8     MUNMAP        .. next segment in the template unmapped
-        0x10    REVERSE       .. SEQ is reverse complemented
-        0x20    MREVERSE      .. SEQ of the next segment in the template is reversed
-        0x40    READ1         .. the first segment in the template
-        0x80    READ2         .. the last segment in the template
-        0x100   SECONDARY     .. secondary alignment
-        0x200   QCFAIL        .. not passing quality controls
-        0x400   DUP           .. PCR or optical duplicate
-        0x800   SUPPLEMENTARY .. supplementary alignment
-
-samtools flags 16
-0x10    16      REVERSE
 ```
 
-# samtools calmd/fillmd
+    ## 
+    ## About: Convert between textual and numeric flag representation
+    ## Usage: samtools flags INT|STR[,...]
+    ## 
+    ## Flags:
+    ##  0x1 PAIRED        .. paired-end (or multiple-segment) sequencing technology
+    ##  0x2 PROPER_PAIR   .. each segment properly aligned according to the aligner
+    ##  0x4 UNMAP         .. segment unmapped
+    ##  0x8 MUNMAP        .. next segment in the template unmapped
+    ##  0x10    REVERSE       .. SEQ is reverse complemented
+    ##  0x20    MREVERSE      .. SEQ of the next segment in the template is reversed
+    ##  0x40    READ1         .. the first segment in the template
+    ##  0x80    READ2         .. the last segment in the template
+    ##  0x100   SECONDARY     .. secondary alignment
+    ##  0x200   QCFAIL        .. not passing quality controls
+    ##  0x400   DUP           .. PCR or optical duplicate
+    ##  0x800   SUPPLEMENTARY .. supplementary alignment
 
-The calmd or fillmd tool is useful for visualising mismatches and insertions in an alignment of a read to a reference genome. For example:
+samtools calmd/fillmd
+=====================
 
-```bash
-#the -e changes identical bases between the read and reference into a bunch of =
-samtools view -b aln.bam | samtools fillmd -e - sequence/ref.fa | head
-@HD     VN:1.3  SO:coordinate
-@SQ     SN:1000000      LN:1000000
-@PG     ID:bwa  PN:bwa  VN:0.7.13-r1126 CL:bwa/bwa mem sequence/ref.fa sequence/l100_n10000_d300_31_1.fq sequence/l100_n10000_d300_31_2.fq
-6125:151        99      1000000 151     60      100M    =       451     400     ====================================================================================================    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ    NM:i:0  MD:Z:100        AS:i:100        XS:i:0
-9336:174        99      1000000 174     60      100M    =       474     400     ====================================================================================================    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ    NM:i:0  MD:Z:100        AS:i:100        XS:i:0
-1355:335        99      1000000 335     60      100M    =       635     400     ====================================================================================================    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ    NM:i:0  MD:Z:100        AS:i:100        XS:i:0
-7456:415        99      1000000 415     60      100M    =       715     400     ====================================================================================================    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ    NM:i:0  MD:Z:100        AS:i:100        XS:i:0
-6125:151        147     1000000 451     60      100M    =       151     -400    ====================================================================================================    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ    NM:i:0  MD:Z:100        AS:i:100        XS:i:0
-9336:174        147     1000000 474     60      100M    =       174     -400    ====================================================================================================    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ    NM:i:0  MD:Z:100        AS:i:100        XS:i:0
-1355:335        147     1000000 635     60      100M    =       335     -400    ====================================================================================================    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ    NM:i:0  MD:Z:100        AS:i:100        XS:i:0
+The calmd or fillmd tool is useful for visualising mismatches and insertions in an alignment of a read to a reference genome. The `-e` argument changes identical bases between the read and reference into `=`.
+
+``` bash
+samtools view -b eg/ERR188273_chrX.bam | samtools fillmd -e - ~/github/rnaseq/raw/chrX_data/genome/chrX.fa > eg/ERR188273_chrX_fillmd.bam
+
+head eg/ERR188273_chrX_fillmd.bam
 ```
 
-The reads I have generated have no mismatches, so they are all displayed as equal signs.
+    ## @HD  VN:1.0  SO:coordinate
+    ## @SQ  SN:chrX LN:156040895
+    ## @PG  ID:hisat2   PN:hisat2   VN:2.2.0    CL:"/Users/dtang/github/rnaseq/hisat2/../src/hisat2-2.2.0/hisat2-align-s --wrapper basic-0 --dta -p 4 -x ../raw/chrX_data/indexes/chrX_tran -1 /tmp/4195.inpipe1 -2 /tmp/4195.inpipe2"
+    ## ERR188273.4711308    73  chrX    21649   0   5S70M   =   21649   0   CGGGT====================================================================== @@@F=DDFFHGHBHIFFHIGGIFGEGHFHIGIGIFIIIGIGIGGDHIIGIIC@>DGHCHHHGHHFFFFFDEACC@ AS:i:-5 ZS:i:-5 XN:i:0  XM:i:0  XO:i:0  XG:i:0  NM:i:0  MD:Z:70 YT:Z:UP NH:i:2
+    ## ERR188273.4711308    133 chrX    21649   0   *   =   21649   0   CTACAGGTGCCCGCCACCATGCCCAGCTAATTTTTTTTGTATTTTTAGTAGAGATGGGGTTTCACTGTGTTGGCC CB@FDFFFHHGFHIJJJJIIIIIIIGGGIJGIIJJJJJJFFHIIIIGECHEHHGGHHFF?AACCDDDDDDDDBCD YT:Z:UP
+    ## ERR188273.4711308    329 chrX    233717  0   5S70M   =   233717  0   CGGGT====================================================================== @@@F=DDFFHGHBHIFFHIGGIFGEGHFHIGIGIFIIIGIGIGGDHIIGIIC@>DGHCHHHGHHFFFFFDEACC@ AS:i:-5 ZS:i:-5 XN:i:0  XM:i:0  XO:i:0  XG:i:0  NM:i:0  MD:Z:70 YT:Z:UP NH:i:2
+    ## ERR188273.14904746   99  chrX    251271  60  75M =   251317  121 =========================================================================== @@<DDDDDFB>HHEGIIGAGIIIBGIIG@FECH<F@GIIFAE=?BCBBCBBB5@<?CBBCCCCAACDCCCCCCCC AS:i:0  XN:i:0  XM:i:0  XO:i:0  XG:i:0  NM:i:0  MD:Z:75 YS:i:-2 YT:Z:CP NH:i:1
+    ## ERR188273.14904746   147 chrX    251317  60  75M =   251271  -121    ======C==================================================================== #######B?DAHC@EGIIGGEHHGC@GFBFCEGFCIGG@EG@@H<JIEHEF@IGEHGHIIHFGHDDFDDDDD?<B AS:i:-2 ZS:i:-7 XN:i:0  XM:i:1  XO:i:0  XG:i:0  NM:i:1  MD:Z:6A68   YS:i:0  YT:Z:CP NH:i:1
+    ## ERR188273.5849805    163 chrX    265951  1   75M =   266022  146 =========================================================================== @CCFDFFFHHHHHJJJJJJFJJJJJIJIJJJJJJJJGHIJJJJJEHIJIJGIIJJJHHFFDDEDDDDDDDDDDDD AS:i:0  ZS:i:0  XN:i:0  XM:i:0  XO:i:0  XG:i:0  NM:i:0  MD:Z:75 YS:i:0  YT:Z:CP NH:i:2
+    ## ERR188273.1232356    369 chrX    265984  1   75M =   118343251   0   =========================================================================== @@CA@B>DC>>+@::8-755-BBBFDDEHHBGGEGHEEIJIIGIJJIGEIIIJJJIIJJIGGHHHGGFFFFF@@C AS:i:0  ZS:i:0  XN:i:0  XM:i:0  XO:i:0  XG:i:0  NM:i:0  MD:Z:75 YT:Z:UP NH:i:10
 
-# Creating fastq files from a BAM file
+Creating fastq files from a BAM file
+====================================
 
-Use BEDTools.
-
-```bash
-bedtools bamtofastq -i aln.bam -fq aln.fq
+``` bash
+samtools fastq -1 eg/ERR188273_chrX_1.fq -2 eg/ERR188273_chrX_2.fq eg/ERR188273_chrX.bam
+head eg/ERR188273_chrX_1.fq
 ```
 
-There is the `fastq` subcommand in the newer version of SAMtools.
+    ## [M::bam2fq_mainloop] discarded 0 singletons
+    ## [M::bam2fq_mainloop] processed 1160084 reads
+    ## @ERR188273.4711308
+    ## CGGGTGATCACGAGGTCAGGAGATCAAGACCATCCTGGCCAACACAGTGAAACCCCATCTCTACTAAAAATACAA
+    ## +
+    ## @@@F=DDFFHGHBHIFFHIGGIFGEGHFHIGIGIFIIIGIGIGGDHIIGIIC@>DGHCHHHGHHFFFFFDEACC@
+    ## @ERR188273.14904746
+    ## GAAAAATGGGCCCAGGGGACCGGCGCTCAGCATACAGAGGACCCGCGCCGGCACCTGCCTCTGAGTTCCCTTAGT
+    ## +
+    ## @@<DDDDDFB>HHEGIIGAGIIIBGIIG@FECH<F@GIIFAE=?BCBBCBBB5@<?CBBCCCCAACDCCCCCCCC
+    ## @ERR188273.5849805
+    ## CACGAGGTCAGGAGATCGACACCATCCTGGCTAACACGGTGAAACCCCGTCTCTACTAAAAATACAAAAAATTAG
 
-```bash
-samtools fastq -1 aln_1.fq -2 aln_2.fq aln.bam
+Random subsampling of BAM file
+==============================
+
+The SAMtools view `-s` parameter allows you to randomly sample lines of a BAM file. Using `0.5` will subsample half of all mapped reads.
+
+``` bash
+samtools view -s 0.5 -b eg/ERR188273_chrX.bam > eg/ERR188273_chrX_rand.bam
 ```
 
-# Random subsampling of BAM file
+Count number of reads
+=====================
 
-The SAMtools view -s parameter allows you to randomly sample lines of a BAM file
+Use `samtools idxstats` to print stats on a BAM file; this requires an index file which is created by running `samtools index`.
 
-```bash
-samtools view -s 0.5 -b aln.bam > aln_random.bam
-```
-
-Note that this will subsample half of the reads that mapped.
-
-# Fastest way to count number of reads
-
-Use `samtools idxstats` to print stats on a BAM file; this requires an index file which is created by running `samtools index`. The reference sequence name of the example SAM file in this repository is (confusingly) called 1000000. More standard reference names are 'chr1', 'chr2', etc.
-
-```bash
-# convert to BAM and sort
-samtools view -bS aln.sam | samtools sort - > aln.bam
-
-# index
-samtools index aln.bam
-
+``` bash
 # output of idxstats is:
 # ref name, sequence length of ref, no. mapped reads, and no. unmapped reads
-samtools idxstats aln.bam
-1000000 1000000 20000   0
-*       0       0       0
+samtools idxstats eg/ERR188273_chrX.bam
+```
 
+    ## chrX 156040895   1126961 45067
+    ## *    0   0   4332
+
+We can use this with `awk` to sum up the columns.
+
+``` bash
 # number of reads = mapped + unmapped
-samtools idxstats aln.bam | awk '{s+=$3+$4} END {print s}'
-20000
+samtools idxstats eg/ERR188273_chrX.bam | awk '{s+=$3+$4} END {print s}'
 
 # number of mapped reads = 3rd column
-samtools idxstats aln.bam | awk '{s+=$3} END {print s}'
-20000
+samtools idxstats eg/ERR188273_chrX.bam  | awk '{s+=$3} END {print s}'
 ```
 
-# Obtaining genomic sequence
+    ## 1176360
+    ## 1126961
 
-```bash
+Obtaining genomic sequence
+==========================
+
+Use `faidx` to fetch genomic sequence; coordinates are 1-based.
+
+``` bash
 # index fasta file
-samtools faidx sequence/ref.fa
+samtools faidx ~/github/rnaseq/raw/chrX_data/genome/chrX.fa
 
 # obtain sequence
-samtools faidx sequence/ref.fa 1000000:10-11
->1000000:10-11
-AG
-
-# note the 1-based start
-samtools faidx sequence/ref.fa 1000000:0-2
->1000000:0-2
-AG
-
-samtools faidx sequence/ref.fa 1000000:1-2
->1000000:1-2
-AG
+samtools faidx ~/github/rnaseq/raw/chrX_data/genome/chrX.fa chrX:300000-300100
 ```
 
-# Comparing BAM files
+    ## >chrX:300000-300100
+    ## ctgagatcgtgccactgcactccagcctgggcgacagagcgagactccatctcaaaaaaa
+    ## aaaaaaaaaaaaaagaTggggtctctctatgttggccaggt
+
+Comparing BAM files
+===================
 
 Install [deepTools](https://deeptools.readthedocs.io/en/develop/) and use [bamCompare](https://deeptools.readthedocs.io/en/develop/content/tools/bamCompare.html). The bigWig output file shows the ratio of reads between `b1` and `b2` in 50 bp (default) windows.
 
-```bash
-# create BAM files
-samtools view -bS aln.sam | samtools sort > aln.bam
-samtools view -bS aln2.sam | samtools sort > aln2.bam
-
-# index
-samtools index aln.bam
-samtools index aln2.bam
-
-bamCompare -b1 aln.bam -b2 aln2.bam -of bigwig -o aln_compare.bw
-```
-
-![bamCompare](img/bam_compare_igv.png)
-
-# Converting reference names
+Converting reference names
+==========================
 
 One of the most annoying bioinformatics problems is the use of different chromosome names, e.g. chr1 vs 1, in different references even when the sequences are identical. The GRCh38 reference downloaded from Ensembl has chromosome names without the `chr`:
 
@@ -535,134 +499,62 @@ Whereas the reference names from UCSC has the `chr`:
 
     >chr1  AC:CM000663.2  gi:568336023  LN:248956422  rl:Chromosome  M5:6aef897c3d6ff0c78aff06ac189178dd  AS:GRCh38
 
-Luckily you can change the reference names using `samtools reheader` but just make sure your reference sequences are actually identical. Let's change the reference name for `aln.bam` by modifying the header.
+Luckily you can change the reference names using `samtools reheader` but just make sure your reference sequences are actually identical.
 
-```bash
-samtools view aln.bam | head -2
-6125:151        99      1000000 151     60      100M    =       451     400     TAGTTCTAAGCGGCGAGTACCTAAGGGGCGGGGGGACTGACCGCCAGCTATTCAGTGAGTAAAGGGGAACCCTTCTTAGGTGCGCGTGTGTAAGAGAGCG    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ     NM:i:0  MD:Z:100        AS:i:100        XS:i:0
-9336:174        99      1000000 174     60      100M    =       474     400     AGGGGCGGGGGGACTGACCGCCAGCTATTCAGTGAGTAAAGGGGAACCCTTCTTAGGTGCGCGTGTGTAAGAGAGCGTGCGGGTATAAGGGATGCTACTT    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ     NM:i:0  MD:Z:100        AS:i:100        XS:i:0
+``` bash
+samtools view eg/ERR188273_chrX.bam | head -2
 
 # view header
-samtools view -H aln.bam
-@HD     VN:1.5  SO:coordinate
-@SQ     SN:1000000      LN:1000000
-@PG     ID:bwa  PN:bwa  VN:0.7.15-r1142-dirty   CL:bwa/bwa mem sequence/ref.fa sequence/l100_n10000_d300_31_1.fq sequence/l100_n10000_d300_31_2.fq
+samtools view -H eg/ERR188273_chrX.bam
 
 # substitute header with new name
-samtools view -H aln.bam | sed 's/SN:1000000/SN:my_ref/' > my_header
-
-# check out new bam file
-samtools reheader my_header aln.bam | samtools view | head -2
-6125:151        99      my_ref  151     60      100M    =       451     400     TAGTTCTAAGCGGCGAGTACCTAAGGGGCGGGGGGACTGACCGCCAGCTATTCAGTGAGTAAAGGGGAACCCTTCTTAGGTGCGCGTGTGTAAGAGAGCG    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ     NM:i:0  MD:Z:100        AS:i:100        XS:i:0
-9336:174        99      my_ref  174     60      100M    =       474     400     AGGGGCGGGGGGACTGACCGCCAGCTATTCAGTGAGTAAAGGGGAACCCTTCTTAGGTGCGCGTGTGTAAGAGAGCGTGCGGGTATAAGGGATGCTACTT    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ     NM:i:0  MD:Z:100        AS:i:100        XS:i:0
+samtools view -H eg/ERR188273_chrX.bam | sed 's/SN:chrX/SN:X/' > eg/my_header
 
 # save bam file with new ref
-samtools reheader my_header aln.bam > aln_my_ref.bam
+samtools reheader eg/my_header eg/ERR188273_chrX.bam > eg/ERR188273_X.bam
+
+samtools view eg/ERR188273_X.bam | head -2
 ```
 
-# Coverage
+    ## ERR188273.4711308    73  chrX    21649   0   5S70M   =   21649   0   CGGGTGATCACGAGGTCAGGAGATCAAGACCATCCTGGCCAACACAGTGAAACCCCATCTCTACTAAAAATACAA @@@F=DDFFHGHBHIFFHIGGIFGEGHFHIGIGIFIIIGIGIGGDHIIGIIC@>DGHCHHHGHHFFFFFDEACC@ AS:i:-5 ZS:i:-5 XN:i:0  XM:i:0  XO:i:0  XG:i:0  NM:i:0  MD:Z:70 YT:Z:UP NH:i:2
+    ## ERR188273.4711308    133 chrX    21649   0   *   =   21649   0   CTACAGGTGCCCGCCACCATGCCCAGCTAATTTTTTTTGTATTTTTAGTAGAGATGGGGTTTCACTGTGTTGGCC CB@FDFFFHHGFHIJJJJIIIIIIIGGGIJGIIJJJJJJFFHIIIIGECHEHHGGHHFF?AACCDDDDDDDDBCD YT:Z:UP
+    ## @HD  VN:1.0  SO:coordinate
+    ## @SQ  SN:chrX LN:156040895
+    ## @PG  ID:hisat2   PN:hisat2   VN:2.2.0    CL:"/Users/dtang/github/rnaseq/hisat2/../src/hisat2-2.2.0/hisat2-align-s --wrapper basic-0 --dta -p 4 -x ../raw/chrX_data/indexes/chrX_tran -1 /tmp/4195.inpipe1 -2 /tmp/4195.inpipe2"
+    ## ERR188273.4711308    73  X   21649   0   5S70M   =   21649   0   CGGGTGATCACGAGGTCAGGAGATCAAGACCATCCTGGCCAACACAGTGAAACCCCATCTCTACTAAAAATACAA @@@F=DDFFHGHBHIFFHIGGIFGEGHFHIGIGIFIIIGIGIGGDHIIGIIC@>DGHCHHHGHHFFFFFDEACC@ AS:i:-5 ZS:i:-5 XN:i:0  XM:i:0  XO:i:0  XG:i:0  NM:i:0  MD:Z:70 YT:Z:UP NH:i:2
+    ## ERR188273.4711308    133 X   21649   0   *   =   21649   0   CTACAGGTGCCCGCCACCATGCCCAGCTAATTTTTTTTGTATTTTTAGTAGAGATGGGGTTTCACTGTGTTGGCC CB@FDFFFHHGFHIJJJJIIIIIIIGGGIJGIIJJJJJJFFHIIIIGECHEHHGGHHFF?AACCDDDDDDDDBCD YT:Z:UP
+
+Coverage
+========
 
 We can use `samtools depth` to tally the number of reads covering a region; the three columns are the reference, position, and read coverage. In the example below, there are two reads covering positions 200 - 205. The `samtools mpileup` command can provide more information, including:
 
-1. Sequence name
-2. 1-based coordinate
-3. Reference base
-4. Number of reads covering this position
-5. Read bases
-6. Base qualities
-7. Alignment mapping qualities
+1.  Sequence name
+2.  1-based coordinate
+3.  Reference base
+4.  Number of reads covering this position
+5.  Read bases
+6.  Base qualities
+7.  Alignment mapping qualities
 
-See https://davetang.org/muse/2015/08/26/samtools-mpileup/ for more information.
+See <https://davetang.org/muse/2015/08/26/samtools-mpileup/> for more information.
 
-```bash
-# create sorted BAM file
-samtools view -b aln.sam | samtools sort - -o aln.bam
-
-samtools depth aln.bam | sed -n '50,55p'
-1000000 200     2
-1000000 201     2
-1000000 202     2
-1000000 203     2
-1000000 204     2
-1000000 205     2
-
-samtools mpileup -f sequence/ref.fa -s aln.bam | sed -n '50,55p'
-[mpileup] 1 samples in 1 input files
-<mpileup> Set max per-file depth to 8000
-1000000 200     A       2       ..      JJ      ]]
-1000000 201     T       2       ..      JJ      ]]
-1000000 202     T       2       ..      JJ      ]]
-1000000 203     C       2       ..      JJ      ]]
-1000000 204     A       2       ..      JJ      ]]
-1000000 205     G       2       ..      JJ      ]]
+``` bash
+samtools depth eg/ERR188273_chrX.bam | head
 ```
 
-# Docker
+    ## chrX 21649   1
+    ## chrX 21650   1
+    ## chrX 21651   1
+    ## chrX 21652   1
+    ## chrX 21653   1
+    ## chrX 21654   1
+    ## chrX 21655   1
+    ## chrX 21656   1
+    ## chrX 21657   1
+    ## chrX 21658   1
 
-Run `samtools` within a Docker container.
-
-```bash
-# https://hub.docker.com/r/biocontainers/samtools
-docker pull biocontainers/samtools:v1.7.0_cv4
-
-# the image is quite large
-docker images | grep samtools
-biocontainers/samtools       v1.7.0_cv4          bdeba5ee5fc8        2 months ago        1.33GB
-
-# default usage
-docker run --rm biocontainers/samtools:v1.7.0_cv4 samtools
-
-Program: samtools (Tools for alignments in the SAM format)
-Version: 1.7 (using htslib 1.7)
-
-Usage:   samtools <command> [options]
-
-Commands:
-  -- Indexing
-     dict           create a sequence dictionary file
-     faidx          index/extract FASTA
-     index          index alignment
-
-  -- Editing
-     calmd          recalculate MD/NM tags and '=' bases
-     fixmate        fix mate information
-     reheader       replace BAM header
-     targetcut      cut fosmid regions (for fosmid pool only)
-     addreplacerg   adds or replaces RG tags
-     markdup        mark duplicates
-
-  -- File operations
-     collate        shuffle and group alignments by name
-     cat            concatenate BAMs
-     merge          merge sorted alignments
-     mpileup        multi-way pileup
-     sort           sort alignment file
-     split          splits a file by read group
-     quickcheck     quickly check if SAM/BAM/CRAM file appears intact
-     fastq          converts a BAM to a FASTQ
-     fasta          converts a BAM to a FASTA
-
-  -- Statistics
-     bedcov         read depth per BED region
-     depth          compute the depth
-     flagstat       simple stats
-     idxstats       BAM index stats
-     phase          phase heterozygotes
-     stats          generate stats (former bamcheck)
-
-  -- Viewing
-     flags          explain BAM flags
-     tview          text alignment viewer
-     view           SAM<->BAM<->CRAM conversion
-     depad          convert padded BAM to unpadded BAM
-```
-
-Use `-v` to mount a file to the Docker container.
-
-```bash
-docker run --rm -v /Users/dtang/github/learning_bam_file/:/tmp/ biocontainers/samtools:v1.7.0_cv4 samtools view -bS /tmp/aln.sam -o /tmp/aln2.bam
-```
-
-# Stargazers over time
+Stargazers over time
+====================
 
 [![Stargazers over time](https://starchart.cc/davetang/learning_bam_file.svg)](https://starchart.cc/davetang/learning_bam_file)

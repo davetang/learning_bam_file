@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 SAMtools provides various (sub)tools for manipulating alignments in the SAM/BAM format. The SAM (Sequence Alignment/Map) format (BAM is just the binary form of SAM) is currently the _de facto_ standard for storing large nucleotide sequence alignments. If you are dealing with high-throughput sequencing data, at some point you will probably have to deal with SAM/BAM files, so familiarise yourself with them! For the latest information, please refer to the [release notes](https://github.com/samtools/samtools/releases).
 
-The examples below use the `ERR188273_chrX.bam` BAM file generated as per https://github.com/davetang/rnaseq using the HISAT2 + StringTie2 RNA-seq pipeline.
+The examples below use the `ERR188273_chrX.bam` BAM file generated as per https://github.com/davetang/rnaseq using the HISAT2 + StringTie2 RNA-seq pipeline. This README is generated using the `create_readme.sh` script; if you want to generate this file yourself, make sure you have `samtools` (version >1.9), `gh-md-toc`, R, and the R `rmarkdown` package installed and have downloaded the reference files as per https://github.com/davetang/rnaseq.
 
 # Installing SAMtools
 
@@ -83,7 +83,7 @@ samtools view -b eg/ERR188273_chrX.sam > eg/my.bam
 Use `samtools view` with the `-T` and `-C` arguments to convert a BAM file into CRAM.
 
 ```{bash engine.opts='-l'}
-samtools view -T /Users/dtang/github/rnaseq/raw/chrX_data/genome/chrX.fa -C -o eg/ERR188273_chrX.cram eg/ERR188273_chrX.bam
+samtools view -T ~/github/rnaseq/raw/chrX_data/genome/chrX.fa -C -o eg/ERR188273_chrX.cram eg/ERR188273_chrX.bam
 
 ls -lh eg/ERR188273_chrX.[sbcr]*am
 ```
@@ -191,7 +191,7 @@ samtools flags
 The calmd or fillmd tool is useful for visualising mismatches and insertions in an alignment of a read to a reference genome. The `-e` argument changes identical bases between the read and reference into `=`.
 
 ```{bash engine.opts='-l'}
-samtools view -b eg/ERR188273_chrX.bam | samtools fillmd -e - /Users/dtang/github/rnaseq/raw/chrX_data/genome/chrX.fa > eg/ERR188273_chrX_fillmd.bam
+samtools view -b eg/ERR188273_chrX.bam | samtools fillmd -e - ~/github/rnaseq/raw/chrX_data/genome/chrX.fa > eg/ERR188273_chrX_fillmd.bam
 
 head eg/ERR188273_chrX_fillmd.bam
 ```
@@ -237,10 +237,10 @@ Use `faidx` to fetch genomic sequence; coordinates are 1-based.
 
 ```{bash engine.opts='-l'}
 # index fasta file
-samtools faidx /Users/dtang/github/rnaseq/raw/chrX_data/genome/chrX.fa
+samtools faidx ~/github/rnaseq/raw/chrX_data/genome/chrX.fa
 
 # obtain sequence
-samtools faidx /Users/dtang/github/rnaseq/raw/chrX_data/genome/chrX.fa chrX:300000-300100
+samtools faidx ~/github/rnaseq/raw/chrX_data/genome/chrX.fa chrX:300000-300100
 ```
 
 # Comparing BAM files
