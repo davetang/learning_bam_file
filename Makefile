@@ -21,7 +21,7 @@ miniconda3/bin/R: miniconda3
 	miniconda3/bin/conda install -y -c conda-forge r-base
 
 miniconda3/lib/R/library/rmarkdown: miniconda3/bin/R
-	miniconda3/bin/Rscript -e "Sys.setenv(PATH=paste0(Sys.getenv("PATH"), ":", getwd(), "/miniconda3/bin")); install.packages('rmarkdown', repos='http://cran.us.r-project.org')"
+	miniconda3/bin/Rscript -e "Sys.setenv(PATH=paste0(Sys.getenv('PATH'), ':', getwd(), '/miniconda3/bin')); install.packages('rmarkdown', repos='http://cran.us.r-project.org')"
 
 readme: genome/chrX.fa github-markdown-toc samtools miniconda3 pandoc miniconda3/bin/R miniconda3/lib/R/library/rmarkdown
 	./create_readme.sh
