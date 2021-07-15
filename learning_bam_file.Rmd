@@ -1,9 +1,7 @@
 ---
 title: "Learning the BAM format"
 date: "`r Sys.Date()`"
-output:
-  md_document:
-    variant: gfm
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
@@ -252,23 +250,26 @@ samtools view -s 0.5 -b eg/ERR188273_chrX.bam > eg/ERR188273_chrX_rand.bam
 
 # Count number of reads
 
-Use `samtools idxstats` to print stats on a BAM file; this requires an index file which is created by running `samtools index`.
+Use `samtools idxstats` to print stats on a BAM file; this requires an index file which is created by running `samtools index`. The output of idxstats is a file with four tab-delimited columns:
+
+1. Reference name
+2. Sequence length of reference
+3. Number of mapped reads
+4. Number of unmapped reads
 
 ```{bash engine.opts='-l'}
-# output of idxstats is:
-# ref name, sequence length of ref, no. mapped reads, and no. unmapped reads
 samtools idxstats eg/ERR188273_chrX.bam
 ```
 
 We can use this with `awk` to calculate:
 
-The number of mapped reads.
+The number of mapped reads by summing the third column.
 
 ```{bash engine.opts='-l'}
 samtools idxstats eg/ERR188273_chrX.bam  | awk '{s+=$3} END {print s}'
 ```
 
-The number of reads, which is the number of mapped + unmapped.
+The number of reads, which is the sum of mapped and unmapped reads.
 
 ```{bash engine.opts='-l'}
 samtools idxstats eg/ERR188273_chrX.bam | awk '{s+=$3+$4} END {print s}'
@@ -308,16 +309,24 @@ Luckily you can change the reference names using `samtools reheader` but just ma
 
 ```{bash engine.opts='-l'}
 samtools view eg/ERR188273_chrX.bam | head -2
+```
 
-# view header
+View header
+
+```{bash engine.opts='-l'}
 samtools view -H eg/ERR188273_chrX.bam
+```
 
-# substitute header with new name
+Substitute header with new name.
+
+```{bash engine.opts='-l'}
 samtools view -H eg/ERR188273_chrX.bam | sed 's/SN:chrX/SN:X/' > eg/my_header
+```
 
-# save bam file with new ref
+Save bam file with new ref and check it out.
+
+```{bash engine.opts='-l'}
 samtools reheader eg/my_header eg/ERR188273_chrX.bam > eg/ERR188273_X.bam
-
 samtools view eg/ERR188273_X.bam | head -2
 ```
 

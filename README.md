@@ -2,6 +2,7 @@
 Table of Contents
 =================
 
+* [Learning the BAM format](#learning-the-bam-format)
 * [Introduction](#introduction)
 * [Installing SAMtools](#installing-samtools)
 * [Basic usage](#basic-usage)
@@ -27,15 +28,11 @@ Table of Contents
 
 Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
-Thu Jul 15 14:17:10 JST 2021
+Thu Jul 15 14:37:16 JST 2021
 
----
-date: 2021-07-15
-output:
-  md_document:
-    variant: gfm
-title: Learning the BAM format
----
+Learning the BAM format
+================
+2021-07-15
 
 # Introduction
 
@@ -175,7 +172,7 @@ Size of SAM file.
 ls -lh eg/ERR188273_chrX.sam
 ```
 
-    ## -rw-r--r-- 1 dtang dtang 321M Jul 15 14:09 eg/ERR188273_chrX.sam
+    ## -rw-r--r-- 1 dtang dtang 321M Jul 15 14:34 eg/ERR188273_chrX.sam
 
 Size of BAM file.
 
@@ -234,8 +231,8 @@ ls -lh eg/ERR188273_chrX.[sbcr]*am
 ```
 
     ## -rw-r--r-- 1 dtang dtang  67M Jul 15 13:55 eg/ERR188273_chrX.bam
-    ## -rw-r--r-- 1 dtang dtang  40M Jul 15 14:10 eg/ERR188273_chrX.cram
-    ## -rw-r--r-- 1 dtang dtang 321M Jul 15 14:09 eg/ERR188273_chrX.sam
+    ## -rw-r--r-- 1 dtang dtang  40M Jul 15 14:35 eg/ERR188273_chrX.cram
+    ## -rw-r--r-- 1 dtang dtang 321M Jul 15 14:34 eg/ERR188273_chrX.sam
 
 You can use `samtools view` to view a CRAM file just as you would for a
 BAM file.
@@ -244,8 +241,6 @@ BAM file.
 samtools view eg/ERR188273_chrX.cram | head
 ```
 
-    ## [E::easy_errno] Libcurl reported error 52 (Server returned nothing (no headers, no data))
-    ## [W::find_file_url] Failed to open reference "https://www.ebi.ac.uk/ena/cram/md5/49527016a48497d9d1cbd8e4a9049bd3": Input/output error
     ## ERR188273.4711308    73  chrX    21649   0   5S70M   =   21649   0   CGGGTGATCACGAGGTCAGGAGATCAAGACCATCCTGGCCAACACAGTGAAACCCCATCTCTACTAAAAATACAA @@@F=DDFFHGHBHIFFHIGGIFGEGHFHIGIGIFIIIGIGIGGDHIIGIIC@>DGHCHHHGHHFFFFFDEACC@ AS:i:-5 ZS:i:-5 XN:i:0  XM:i:0  XO:i:0  XG:i:0  YT:Z:UP NH:i:2  MD:Z:70 NM:i:0
     ## ERR188273.4711308    133 chrX    21649   0   *   =   21649   0   CTACAGGTGCCCGCCACCATGCCCAGCTAATTTTTTTTGTATTTTTAGTAGAGATGGGGTTTCACTGTGTTGGCC CB@FDFFFHHGFHIJJJJIIIIIIIGGGIJGIIJJJJJJFFHIIIIGECHEHHGGHHFF?AACCDDDDDDDDBCD YT:Z:UP
     ## ERR188273.4711308    329 chrX    233717  0   5S70M   =   233717  0   CGGGTGATCACGAGGTCAGGAGATCAAGACCATCCTGGCCAACACAGTGAAACCCCATCTCTACTAAAAATACAA @@@F=DDFFHGHBHIFFHIGGIFGEGHFHIGIGIFIIIGIGIGGDHIIGIIC@>DGHCHHHGHHFFFFFDEACC@ AS:i:-5 ZS:i:-5 XN:i:0  XM:i:0  XO:i:0  XG:i:0  YT:Z:UP NH:i:2  MD:Z:70 NM:i:0
@@ -275,7 +270,7 @@ ls -lh eg/sorted.bam
 ```
 
     ## -rw-r--r-- 1 dtang dtang 67M Jul 15 13:55 eg/ERR188273_chrX.bam
-    ## -rw-r--r-- 1 dtang dtang 67M Jul 15 14:15 eg/sorted.bam
+    ## -rw-r--r-- 1 dtang dtang 67M Jul 15 14:35 eg/sorted.bam
 
 You should use use additional threads (if they are available) to speed
 up sorting; to use four threads, use `-@ 4`.
@@ -287,9 +282,9 @@ time samtools sort eg/ERR188273_chrX.sam -o eg/sorted.bam
 ```
 
     ## 
-    ## real 0m17.308s
-    ## user 0m8.319s
-    ## sys  0m0.564s
+    ## real 0m17.198s
+    ## user 0m8.379s
+    ## sys  0m0.526s
 
 Time taken using four threads.
 
@@ -299,9 +294,9 @@ time samtools sort -@ 4 eg/ERR188273_chrX.sam -o eg/sorted.bam
 
     ## [bam_sort_core] merging from 0 files and 4 in-memory blocks...
     ## 
-    ## real 0m3.605s
-    ## user 0m8.827s
-    ## sys  0m0.378s
+    ## real 0m3.632s
+    ## user 0m8.556s
+    ## sys  0m0.426s
 
 Many of the SAMtools subtools can use additional threads, so make use of
 them if you have the resources!
@@ -579,11 +574,15 @@ samtools view -s 0.5 -b eg/ERR188273_chrX.bam > eg/ERR188273_chrX_rand.bam
 # Count number of reads
 
 Use `samtools idxstats` to print stats on a BAM file; this requires an
-index file which is created by running `samtools index`.
+index file which is created by running `samtools index`. The output of
+idxstats is a file with four tab-delimited columns:
+
+1.  Reference name
+2.  Sequence length of reference
+3.  Number of mapped reads
+4.  Number of unmapped reads
 
 ``` bash
-# output of idxstats is:
-# ref name, sequence length of ref, no. mapped reads, and no. unmapped reads
 samtools idxstats eg/ERR188273_chrX.bam
 ```
 
@@ -592,7 +591,7 @@ samtools idxstats eg/ERR188273_chrX.bam
 
 We can use this with `awk` to calculate:
 
-The number of mapped reads.
+The number of mapped reads by summing the third column.
 
 ``` bash
 samtools idxstats eg/ERR188273_chrX.bam  | awk '{s+=$3} END {print s}'
@@ -600,7 +599,7 @@ samtools idxstats eg/ERR188273_chrX.bam  | awk '{s+=$3} END {print s}'
 
     ## 1126961
 
-The number of reads, which is the number of mapped + unmapped.
+The number of reads, which is the sum of mapped and unmapped reads.
 
 ``` bash
 samtools idxstats eg/ERR188273_chrX.bam | awk '{s+=$3+$4} END {print s}'
@@ -655,25 +654,35 @@ just make sure your reference sequences are actually identical.
 
 ``` bash
 samtools view eg/ERR188273_chrX.bam | head -2
-
-# view header
-samtools view -H eg/ERR188273_chrX.bam
-
-# substitute header with new name
-samtools view -H eg/ERR188273_chrX.bam | sed 's/SN:chrX/SN:X/' > eg/my_header
-
-# save bam file with new ref
-samtools reheader eg/my_header eg/ERR188273_chrX.bam > eg/ERR188273_X.bam
-
-samtools view eg/ERR188273_X.bam | head -2
 ```
 
     ## ERR188273.4711308    73  chrX    21649   0   5S70M   =   21649   0   CGGGTGATCACGAGGTCAGGAGATCAAGACCATCCTGGCCAACACAGTGAAACCCCATCTCTACTAAAAATACAA @@@F=DDFFHGHBHIFFHIGGIFGEGHFHIGIGIFIIIGIGIGGDHIIGIIC@>DGHCHHHGHHFFFFFDEACC@ AS:i:-5 ZS:i:-5 XN:i:0  XM:i:0  XO:i:0  XG:i:0  NM:i:0  MD:Z:70 YT:Z:UP NH:i:2
     ## ERR188273.4711308    133 chrX    21649   0   *   =   21649   0   CTACAGGTGCCCGCCACCATGCCCAGCTAATTTTTTTTGTATTTTTAGTAGAGATGGGGTTTCACTGTGTTGGCC CB@FDFFFHHGFHIJJJJIIIIIIIGGGIJGIIJJJJJJFFHIIIIGECHEHHGGHHFF?AACCDDDDDDDDBCD YT:Z:UP
+
+View header
+
+``` bash
+samtools view -H eg/ERR188273_chrX.bam
+```
+
     ## @HD  VN:1.0  SO:coordinate
     ## @SQ  SN:chrX LN:156040895
     ## @PG  ID:hisat2   PN:hisat2   VN:2.2.0    CL:"/Users/dtang/github/rnaseq/hisat2/../src/hisat2-2.2.0/hisat2-align-s --wrapper basic-0 --dta -p 4 -x ../raw/chrX_data/indexes/chrX_tran -1 /tmp/4195.inpipe1 -2 /tmp/4195.inpipe2"
     ## @PG  ID:samtools PN:samtools PP:hisat2   VN:1.13 CL:samtools view -H eg/ERR188273_chrX.bam
+
+Substitute header with new name.
+
+``` bash
+samtools view -H eg/ERR188273_chrX.bam | sed 's/SN:chrX/SN:X/' > eg/my_header
+```
+
+Save bam file with new ref and check it out.
+
+``` bash
+samtools reheader eg/my_header eg/ERR188273_chrX.bam > eg/ERR188273_X.bam
+samtools view eg/ERR188273_X.bam | head -2
+```
+
     ## ERR188273.4711308    73  X   21649   0   5S70M   =   21649   0   CGGGTGATCACGAGGTCAGGAGATCAAGACCATCCTGGCCAACACAGTGAAACCCCATCTCTACTAAAAATACAA @@@F=DDFFHGHBHIFFHIGGIFGEGHFHIGIGIFIIIGIGIGGDHIIGIIC@>DGHCHHHGHHFFFFFDEACC@ AS:i:-5 ZS:i:-5 XN:i:0  XM:i:0  XO:i:0  XG:i:0  NM:i:0  MD:Z:70 YT:Z:UP NH:i:2
     ## ERR188273.4711308    133 X   21649   0   *   =   21649   0   CTACAGGTGCCCGCCACCATGCCCAGCTAATTTTTTTTGTATTTTTAGTAGAGATGGGGTTTCACTGTGTTGGCC CB@FDFFFHHGFHIJJJJIIIIIIIGGGIJGIIJJJJJJFFHIIIIGECHEHHGGHHFF?AACCDDDDDDDDBCD YT:Z:UP
 
