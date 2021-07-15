@@ -28,11 +28,10 @@ Table of Contents
 
 Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
-Thu Jul 15 14:37:16 JST 2021
+Thu Jul 15 14:50:34 JST 2021
 
 Learning the BAM format
 ================
-2021-07-15
 
 # Introduction
 
@@ -172,7 +171,7 @@ Size of SAM file.
 ls -lh eg/ERR188273_chrX.sam
 ```
 
-    ## -rw-r--r-- 1 dtang dtang 321M Jul 15 14:34 eg/ERR188273_chrX.sam
+    ## -rw-r--r-- 1 dtang dtang 321M Jul 15 14:43 eg/ERR188273_chrX.sam
 
 Size of BAM file.
 
@@ -231,8 +230,8 @@ ls -lh eg/ERR188273_chrX.[sbcr]*am
 ```
 
     ## -rw-r--r-- 1 dtang dtang  67M Jul 15 13:55 eg/ERR188273_chrX.bam
-    ## -rw-r--r-- 1 dtang dtang  40M Jul 15 14:35 eg/ERR188273_chrX.cram
-    ## -rw-r--r-- 1 dtang dtang 321M Jul 15 14:34 eg/ERR188273_chrX.sam
+    ## -rw-r--r-- 1 dtang dtang  40M Jul 15 14:43 eg/ERR188273_chrX.cram
+    ## -rw-r--r-- 1 dtang dtang 321M Jul 15 14:43 eg/ERR188273_chrX.sam
 
 You can use `samtools view` to view a CRAM file just as you would for a
 BAM file.
@@ -241,6 +240,8 @@ BAM file.
 samtools view eg/ERR188273_chrX.cram | head
 ```
 
+    ## [E::easy_errno] Libcurl reported error 52 (Server returned nothing (no headers, no data))
+    ## [W::find_file_url] Failed to open reference "https://www.ebi.ac.uk/ena/cram/md5/49527016a48497d9d1cbd8e4a9049bd3": Input/output error
     ## ERR188273.4711308    73  chrX    21649   0   5S70M   =   21649   0   CGGGTGATCACGAGGTCAGGAGATCAAGACCATCCTGGCCAACACAGTGAAACCCCATCTCTACTAAAAATACAA @@@F=DDFFHGHBHIFFHIGGIFGEGHFHIGIGIFIIIGIGIGGDHIIGIIC@>DGHCHHHGHHFFFFFDEACC@ AS:i:-5 ZS:i:-5 XN:i:0  XM:i:0  XO:i:0  XG:i:0  YT:Z:UP NH:i:2  MD:Z:70 NM:i:0
     ## ERR188273.4711308    133 chrX    21649   0   *   =   21649   0   CTACAGGTGCCCGCCACCATGCCCAGCTAATTTTTTTTGTATTTTTAGTAGAGATGGGGTTTCACTGTGTTGGCC CB@FDFFFHHGFHIJJJJIIIIIIIGGGIJGIIJJJJJJFFHIIIIGECHEHHGGHHFF?AACCDDDDDDDDBCD YT:Z:UP
     ## ERR188273.4711308    329 chrX    233717  0   5S70M   =   233717  0   CGGGTGATCACGAGGTCAGGAGATCAAGACCATCCTGGCCAACACAGTGAAACCCCATCTCTACTAAAAATACAA @@@F=DDFFHGHBHIFFHIGGIFGEGHFHIGIGIFIIIGIGIGGDHIIGIIC@>DGHCHHHGHHFFFFFDEACC@ AS:i:-5 ZS:i:-5 XN:i:0  XM:i:0  XO:i:0  XG:i:0  YT:Z:UP NH:i:2  MD:Z:70 NM:i:0
@@ -265,12 +266,12 @@ sorted BAM file from a SAM file.
 
 ``` bash
 samtools sort eg/ERR188273_chrX.sam -o eg/sorted.bam
-ls -lh eg/ERR188273_chrX.bam
-ls -lh eg/sorted.bam
+ls -l eg/ERR188273_chrX.bam
+ls -l eg/sorted.bam
 ```
 
-    ## -rw-r--r-- 1 dtang dtang 67M Jul 15 13:55 eg/ERR188273_chrX.bam
-    ## -rw-r--r-- 1 dtang dtang 67M Jul 15 14:35 eg/sorted.bam
+    ## -rw-r--r-- 1 dtang dtang 69983526 Jul 15 13:55 eg/ERR188273_chrX.bam
+    ## -rw-r--r-- 1 dtang dtang 69983598 Jul 15 14:49 eg/sorted.bam
 
 You should use use additional threads (if they are available) to speed
 up sorting; to use four threads, use `-@ 4`.
@@ -282,9 +283,9 @@ time samtools sort eg/ERR188273_chrX.sam -o eg/sorted.bam
 ```
 
     ## 
-    ## real 0m17.198s
-    ## user 0m8.379s
-    ## sys  0m0.526s
+    ## real 0m17.595s
+    ## user 0m8.307s
+    ## sys  0m0.626s
 
 Time taken using four threads.
 
@@ -294,9 +295,9 @@ time samtools sort -@ 4 eg/ERR188273_chrX.sam -o eg/sorted.bam
 
     ## [bam_sort_core] merging from 0 files and 4 in-memory blocks...
     ## 
-    ## real 0m3.632s
-    ## user 0m8.556s
-    ## sys  0m0.426s
+    ## real 0m3.595s
+    ## user 0m8.689s
+    ## sys  0m0.350s
 
 Many of the SAMtools subtools can use additional threads, so make use of
 them if you have the resources!

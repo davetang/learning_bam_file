@@ -1,6 +1,5 @@
 ---
 title: "Learning the BAM format"
-date: "`r Sys.Date()`"
 output: github_document
 ---
 
@@ -109,8 +108,8 @@ Many downstream tools require sorted BAM files and since they are slightly more 
 
 ```{bash engine.opts='-l'}
 samtools sort eg/ERR188273_chrX.sam -o eg/sorted.bam
-ls -lh eg/ERR188273_chrX.bam
-ls -lh eg/sorted.bam
+ls -l eg/ERR188273_chrX.bam
+ls -l eg/sorted.bam
 ```
 
 You should use use additional threads (if they are available) to speed up sorting; to use four threads, use `-@ 4`.
