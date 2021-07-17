@@ -1,6 +1,9 @@
 all: data tools readme
 data: genome/chrX.fa
-tools: github-markdown-toc samtools miniconda3 pandoc miniconda3/bin/R miniconda3/lib/R/library/rmarkdown
+tools: github-markdown-toc samtools miniconda3 pandoc R rmarkdown
+pandoc: miniconda3/bin/pandoc
+R: miniconda3/bin/R
+rmarkdown: miniconda3/lib/R/library/rmarkdown
 
 genome/chrX.fa:
 	bunzip2 -c eg/chrX.fa.bz2 > genome/chrX.fa
@@ -11,10 +14,17 @@ github-markdown-toc:
 samtools:
 	wget https://github.com/samtools/samtools/releases/download/1.13/samtools-1.13.tar.bz2 && tar xjf samtools-1.13.tar.bz2 && cd samtools-1.13 && ./configure && make && mv samtools .. && cd .. && rm -rf samtools-1.13.tar.bz2 samtools-1.13
 
+OS := $(shell uname -s)
 miniconda3:
+ifeq ($(OS),Darwin)
+	@echo macOS not supported
+	exit 1
+endif
+ifeq ($(OS),Linux)
 	wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.9.2-Linux-x86_64.sh && bash Miniconda3-py39_4.9.2-Linux-x86_64.sh -b -p miniconda3 && miniconda3/bin/conda update -y -n base -c defaults conda && rm Miniconda3-py39_4.9.2-Linux-x86_64.sh
+endif
 
-pandoc: miniconda3
+miniconda3/bin/pandoc: miniconda3
 	miniconda3/bin/conda install -y -c conda-forge pandoc
 
 miniconda3/bin/R: miniconda3
