@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 SAMtools provides various (sub)tools for manipulating alignments in the SAM/BAM format. The SAM (Sequence Alignment/Map) format (BAM is just the binary form of SAM) is currently the _de facto_ standard for storing large nucleotide sequence alignments. If you are working with high-throughput sequencing data, at some point you will probably have to deal with SAM/BAM files, so familiarise yourself with them! For the latest information on SAMtools, please refer to the [release notes](https://github.com/samtools/samtools/releases).
 
-The examples in this README use the `ERR188273_chrX.bam` BAM file (stored in the `eg` folder) generated as per https://github.com/davetang/rnaseq using the HISAT2 + StringTie2 RNA-seq pipeline. This README is generated using the `create_readme.sh` script; if you want to generate this file yourself, you can try using the `Makefile` by running `make` on a Linux-based operating system. This will download the required reference file, compile `samtools` (version 1.13), set up `Miniconda3`, `R`, install the `Rmarkdown` package, and finally generate this README. It will take some time to perform all these steps (and will probably break if you are missing some dependency).
+The examples in this README use the `ERR188273_chrX.bam` BAM file (stored in the `eg` folder) generated as per https://github.com/davetang/rnaseq using the HISAT2 + StringTie2 RNA-seq pipeline. This README is generated using the `create_readme.sh` script; if you want to generate this file yourself, you can try using the `Makefile` by running `make` on a Linux-based operating system. (If you have Conda installed, please run `conda deactivate` first before `make` and if you are using macOS, please refer to the `README.md` in `etc`.) This will download the required reference file, compile `samtools` (version 1.13), set up `Miniconda3`, `R`, install the `Rmarkdown` package, and finally generate this README. It will take some time to perform all these steps (and will probably break if you are missing some dependency).
 
 # Installing SAMtools
 
@@ -331,20 +331,42 @@ samtools view eg/ERR188273_X.bam | head -2
 
 # Coverage
 
-We can use `samtools depth` to tally the number of reads covering a region; the three columns are the reference, position, and read coverage. In the example below, there are two reads covering positions 200 - 205. The `samtools mpileup` command can provide more information, including:
-
-1. Sequence name
-2. 1-based coordinate
-3. Reference base
-4. Number of reads covering this position
-5. Read bases
-6. Base qualities
-7. Alignment mapping qualities
-
-See https://davetang.org/muse/2015/08/26/samtools-mpileup/ for more information.
+There are several ways to calculate coverage, i.e. count the number of bases mapped to positions on the reference. `samtools depth` will return three columns: reference, position, and coverage.
 
 ```{bash engine.opts='-l'}
 samtools depth eg/ERR188273_chrX.bam | head
+```
+
+The `samtools mpileup` command can also provide depth information (but not for reads that have a mapping quality of 0, by default) with some additional information:
+
+1. Sequence name
+2. 1-based coordinate
+3. Reference base (when used with `-f`)
+4. Number of reads covering this position
+5. Read bases
+6. Base qualities
+7. Alignment mapping qualities (when used with `-s`)
+
+```{bash engine.opts='-l'}
+samtools mpileup -f genome/chrX.fa -s eg/ERR188273_chrX.bam | head
+```
+
+I have an [old blog post](https://davetang.org/muse/2015/08/26/samtools-mpileup/) on using `mpileup`.
+
+`samtools coverage` will provide the following coverage statistics:
+
+1. rname - Reference name / chromosome
+2. startpos - Start position
+3. endpos - End position (or sequence length)
+4. numreads - Number reads aligned to the region (after filtering)
+5. covbases - Number of covered bases with depth >= 1
+6. coverage - Proportion of covered bases [0..1]
+7. meandepth - Mean depth of coverage
+8. meanbaseq - Mean base quality in covered region
+9. meanmapq - Mean mapping quality of selected reads
+
+```{bash engine.opts='-l'}
+samtools coverage eg/ERR188273_chrX.bam
 ```
 
 # Stargazers over time

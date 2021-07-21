@@ -28,7 +28,7 @@ Table of Contents
 
 Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
-Thu Jul 15 14:50:34 JST 2021
+Wed Jul 21 11:44:40 JST 2021
 
 Learning the BAM format
 ================
@@ -49,12 +49,14 @@ The examples in this README use the `ERR188273_chrX.bam` BAM file
 <https://github.com/davetang/rnaseq> using the HISAT2 + StringTie2
 RNA-seq pipeline. This README is generated using the `create_readme.sh`
 script; if you want to generate this file yourself, you can try using
-the `Makefile` by running `make` on a Linux-based operating system. This
-will download the required reference file, compile `samtools` (version
-1.13), set up `Miniconda3`, `R`, install the `Rmarkdown` package, and
-finally generate this README. It will take some time to perform all
-these steps (and will probably break if you are missing some
-dependency).
+the `Makefile` by running `make` on a Linux-based operating system. (If
+you have Conda installed, please run `conda deactivate` first before
+`make` and if you are using macOS, please refer to the `README.md` in
+`etc`.) This will download the required reference file, compile
+`samtools` (version 1.13), set up `Miniconda3`, `R`, install the
+`Rmarkdown` package, and finally generate this README. It will take some
+time to perform all these steps (and will probably break if you are
+missing some dependency).
 
 # Installing SAMtools
 
@@ -171,7 +173,7 @@ Size of SAM file.
 ls -lh eg/ERR188273_chrX.sam
 ```
 
-    ## -rw-r--r-- 1 dtang dtang 321M Jul 15 14:43 eg/ERR188273_chrX.sam
+    ## -rw-r--r-- 1 dtang dtang 321M Jul 21 11:42 eg/ERR188273_chrX.sam
 
 Size of BAM file.
 
@@ -230,8 +232,8 @@ ls -lh eg/ERR188273_chrX.[sbcr]*am
 ```
 
     ## -rw-r--r-- 1 dtang dtang  67M Jul 15 13:55 eg/ERR188273_chrX.bam
-    ## -rw-r--r-- 1 dtang dtang  40M Jul 15 14:43 eg/ERR188273_chrX.cram
-    ## -rw-r--r-- 1 dtang dtang 321M Jul 15 14:43 eg/ERR188273_chrX.sam
+    ## -rw-r--r-- 1 dtang dtang  40M Jul 21 11:42 eg/ERR188273_chrX.cram
+    ## -rw-r--r-- 1 dtang dtang 321M Jul 21 11:42 eg/ERR188273_chrX.sam
 
 You can use `samtools view` to view a CRAM file just as you would for a
 BAM file.
@@ -240,8 +242,6 @@ BAM file.
 samtools view eg/ERR188273_chrX.cram | head
 ```
 
-    ## [E::easy_errno] Libcurl reported error 52 (Server returned nothing (no headers, no data))
-    ## [W::find_file_url] Failed to open reference "https://www.ebi.ac.uk/ena/cram/md5/49527016a48497d9d1cbd8e4a9049bd3": Input/output error
     ## ERR188273.4711308    73  chrX    21649   0   5S70M   =   21649   0   CGGGTGATCACGAGGTCAGGAGATCAAGACCATCCTGGCCAACACAGTGAAACCCCATCTCTACTAAAAATACAA @@@F=DDFFHGHBHIFFHIGGIFGEGHFHIGIGIFIIIGIGIGGDHIIGIIC@>DGHCHHHGHHFFFFFDEACC@ AS:i:-5 ZS:i:-5 XN:i:0  XM:i:0  XO:i:0  XG:i:0  YT:Z:UP NH:i:2  MD:Z:70 NM:i:0
     ## ERR188273.4711308    133 chrX    21649   0   *   =   21649   0   CTACAGGTGCCCGCCACCATGCCCAGCTAATTTTTTTTGTATTTTTAGTAGAGATGGGGTTTCACTGTGTTGGCC CB@FDFFFHHGFHIJJJJIIIIIIIGGGIJGIIJJJJJJFFHIIIIGECHEHHGGHHFF?AACCDDDDDDDDBCD YT:Z:UP
     ## ERR188273.4711308    329 chrX    233717  0   5S70M   =   233717  0   CGGGTGATCACGAGGTCAGGAGATCAAGACCATCCTGGCCAACACAGTGAAACCCCATCTCTACTAAAAATACAA @@@F=DDFFHGHBHIFFHIGGIFGEGHFHIGIGIFIIIGIGIGGDHIIGIIC@>DGHCHHHGHHFFFFFDEACC@ AS:i:-5 ZS:i:-5 XN:i:0  XM:i:0  XO:i:0  XG:i:0  YT:Z:UP NH:i:2  MD:Z:70 NM:i:0
@@ -271,7 +271,7 @@ ls -l eg/sorted.bam
 ```
 
     ## -rw-r--r-- 1 dtang dtang 69983526 Jul 15 13:55 eg/ERR188273_chrX.bam
-    ## -rw-r--r-- 1 dtang dtang 69983598 Jul 15 14:49 eg/sorted.bam
+    ## -rw-r--r-- 1 dtang dtang 69983598 Jul 21 11:42 eg/sorted.bam
 
 You should use use additional threads (if they are available) to speed
 up sorting; to use four threads, use `-@ 4`.
@@ -283,9 +283,9 @@ time samtools sort eg/ERR188273_chrX.sam -o eg/sorted.bam
 ```
 
     ## 
-    ## real 0m17.595s
-    ## user 0m8.307s
-    ## sys  0m0.626s
+    ## real 0m17.879s
+    ## user 0m8.395s
+    ## sys  0m0.679s
 
 Time taken using four threads.
 
@@ -295,9 +295,9 @@ time samtools sort -@ 4 eg/ERR188273_chrX.sam -o eg/sorted.bam
 
     ## [bam_sort_core] merging from 0 files and 4 in-memory blocks...
     ## 
-    ## real 0m3.595s
-    ## user 0m8.689s
-    ## sys  0m0.350s
+    ## real 0m4.373s
+    ## user 0m9.085s
+    ## sys  0m0.390s
 
 Many of the SAMtools subtools can use additional threads, so make use of
 them if you have the resources!
@@ -689,22 +689,9 @@ samtools view eg/ERR188273_X.bam | head -2
 
 # Coverage
 
-We can use `samtools depth` to tally the number of reads covering a
-region; the three columns are the reference, position, and read
-coverage. In the example below, there are two reads covering positions
-200 - 205. The `samtools mpileup` command can provide more information,
-including:
-
-1.  Sequence name
-2.  1-based coordinate
-3.  Reference base
-4.  Number of reads covering this position
-5.  Read bases
-6.  Base qualities
-7.  Alignment mapping qualities
-
-See <https://davetang.org/muse/2015/08/26/samtools-mpileup/> for more
-information.
+There are several ways to calculate coverage, i.e. count the number of
+bases mapped to positions on the reference. `samtools depth` will return
+three columns: reference, position, and coverage.
 
 ``` bash
 samtools depth eg/ERR188273_chrX.bam | head
@@ -720,6 +707,57 @@ samtools depth eg/ERR188273_chrX.bam | head
     ## chrX 21656   1
     ## chrX 21657   1
     ## chrX 21658   1
+
+The `samtools mpileup` command can also provide depth information (but
+not for reads that have a mapping quality of 0, by default) with some
+additional information:
+
+1.  Sequence name
+2.  1-based coordinate
+3.  Reference base (when used with `-f`)
+4.  Number of reads covering this position
+5.  Read bases
+6.  Base qualities
+7.  Alignment mapping qualities (when used with `-s`)
+
+``` bash
+samtools mpileup -f genome/chrX.fa -s eg/ERR188273_chrX.bam | head
+```
+
+    ## [mpileup] 1 samples in 1 input files
+    ## chrX 251271  g   1   ^]. @   ]
+    ## chrX 251272  a   1   .   @   ]
+    ## chrX 251273  a   1   .   <   ]
+    ## chrX 251274  a   1   .   D   ]
+    ## chrX 251275  a   1   .   D   ]
+    ## chrX 251276  a   1   .   D   ]
+    ## chrX 251277  t   1   .   D   ]
+    ## chrX 251278  g   1   .   D   ]
+    ## chrX 251279  g   1   .   F   ]
+    ## chrX 251280  g   1   .   B   ]
+
+I have an [old blog
+post](https://davetang.org/muse/2015/08/26/samtools-mpileup/) on using
+`mpileup`.
+
+`samtools coverage` will provide the following coverage statistics:
+
+1.  rname - Reference name / chromosome
+2.  startpos - Start position
+3.  endpos - End position (or sequence length)
+4.  numreads - Number reads aligned to the region (after filtering)
+5.  covbases - Number of covered bases with depth >= 1
+6.  coverage - Proportion of covered bases \[0..1\]
+7.  meandepth - Mean depth of coverage
+8.  meanbaseq - Mean base quality in covered region
+9.  meanmapq - Mean mapping quality of selected reads
+
+``` bash
+samtools coverage eg/ERR188273_chrX.bam
+```
+
+    ## #rname   startpos    endpos  numreads    covbases    coverage    meandepth   meanbaseq   meanmapq
+    ## chrX 1   156040895   1110685 3402037 2.18022 0.532299    36.3    59.4
 
 # Stargazers over time
 
