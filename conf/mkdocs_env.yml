@@ -1,0 +1,7 @@
+name: mkdocs
+channels:
+  - conda-forge
+  - anaconda
+  - defaults
+dependencies:
+  - mkdocs
