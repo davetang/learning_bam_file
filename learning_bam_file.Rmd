@@ -8,7 +8,7 @@ Sys.setenv(PATH=paste0(Sys.getenv("PATH"), ":", getwd()))
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Introduction
+## Introduction
 
 SAMtools provides various (sub)tools for manipulating alignments in the SAM/BAM format. The SAM (Sequence Alignment/Map) format (BAM is just the binary form of SAM) is currently the _de facto_ standard for storing large nucleotide sequence alignments. If you are working with high-throughput sequencing data, at some point you will probably have to deal with SAM/BAM files, so familiarise yourself with them! For the latest information on SAMtools, please refer to the [release notes](https://github.com/samtools/samtools/releases).
 
@@ -27,7 +27,7 @@ docker run --rm -it -v $(pwd):/work davetang/r_build:4.1.0 /bin/bash
 make
 ```
 
-# Installing SAMtools
+## Installing SAMtools
 
 For installing SAMtools, I recommend using `Conda` and the [Bioconda samtools package](https://anaconda.org/bioconda/samtools). I also recommend using [Miniconda](https://docs.conda.io/en/latest/miniconda.html) instead of Anaconda because Anaconda comes with a lot of tools/packages that you will probably not use. I wrote a [short introduction to Conda](https://davetang.github.io/reproducible_bioinformatics/conda.html) if you want to find learn more.
 
@@ -37,7 +37,7 @@ Once you have installed Miniconda, you can install SAMtools as follows:
 conda install -c bioconda samtools
 ```
 
-# Basic usage
+## Basic usage
 
 If you run `samtools` on the terminal without any parameters or with `--help`, all the available utilities are listed:
 
@@ -45,7 +45,7 @@ If you run `samtools` on the terminal without any parameters or with `--help`, a
 samtools --help
 ```
 
-# Viewing
+## Viewing
 
 Use [bioSyntax](https://github.com/bioSyntax/bioSyntax) to prettify your output.
 
@@ -55,7 +55,7 @@ samtools view aln.bam | sam-less
 
 ![bioSyntax](img/sam_less.png)
 
-# Converting a SAM file to a BAM file
+## Converting a SAM file to a BAM file
 
 A BAM file is just a SAM file but stored in binary format; you should always convert your SAM files into BAM format since they are smaller in size and are faster to manipulate.
 
@@ -97,7 +97,7 @@ If the header information is available, we can convert a SAM file into BAM by us
 samtools view -b eg/ERR188273_chrX.sam > eg/my.bam
 ```
 
-# Converting a BAM file to a CRAM file
+## Converting a BAM file to a CRAM file
 
 The CRAM format is even more compact. Use `samtools view` with the `-T` and `-C` arguments to convert a BAM file into CRAM.
 
@@ -115,7 +115,7 @@ samtools view eg/ERR188273_chrX.cram | head
 
 I have an [old blog post](https://davetang.org/muse/2014/09/26/bam-to-cram/) on the CRAM format.
 
-# Sorting a SAM/BAM file
+## Sorting a SAM/BAM file
 
 Many downstream tools require sorted BAM files and since they are slightly more compact than unsorted BAM files, you should always sorted BAM files. In SAMtools version 1.3 or newer, you can directly generate a sorted BAM file from a SAM file.
 
@@ -141,7 +141,7 @@ time samtools sort -@ 4 eg/ERR188273_chrX.sam -o eg/sorted.bam
 
 Many of the SAMtools subtools can use additional threads, so make use of them if you have the resources!
 
-# Creating a BAM index file
+## Creating a BAM index file
 
 Various tools require BAM index files, such as IGV, which is a tool that can be used for visualising BAM files.
 
@@ -149,7 +149,7 @@ Various tools require BAM index files, such as IGV, which is a tool that can be 
 samtools index eg/ERR188273_chrX.bam
 ```
 
-# Interpreting the BAM flags
+## Interpreting the BAM flags
 
 The second column in a SAM/BAM file is the flag column; use the `flags` subcommand to understand specific flags. They may seem confusing at first but the encoding allows details about a read to be stored by just using a few digits. The trick is to convert the numerical digit into binary, and then use the table to interpret the binary numbers, where 1 = true and 0 = false. I wrote a blog post on BAM flags at <http://davetang.org/muse/2014/03/06/understanding-bam-flags/>.
 
@@ -157,7 +157,7 @@ The second column in a SAM/BAM file is the flag column; use the `flags` subcomma
 samtools flags
 ```
 
-# Filtering unmapped reads
+## Filtering unmapped reads
 
 Use `-F 4` to filter out unmapped reads.
 
@@ -177,7 +177,7 @@ We can use the `flags` subcommand to confirm that a value of four represents an 
 samtools flags 4
 ```
 
-# Extracting entries mapping to a specific loci
+## Extracting entries mapping to a specific loci
 
 Use `samtools view` and the `ref:start-end` syntax to extract reads mapping within a specific genomic loci; this requires a BAM index file.
 
@@ -205,7 +205,7 @@ cat eg/my.bed
 samtools view -L eg/my.bed eg/ERR188273_chrX.bam
 ```
 
-# Extracting only the first read from paired end BAM files
+## Extracting only the first read from paired end BAM files
 
 Sometimes you only want the first pair of a mate. 0x0040 is hexadecimal for 64 (i.e. 16 * 4), which is binary for 1000000, corresponding to the read in the first read pair.
 
@@ -219,7 +219,7 @@ Once again, you can use `flags` to verify this (it also accepts hexadecimal inpu
 samtools flags 0x0040
 ```
 
-# Stats
+## Stats
 
 For simple statistics use `samtools flagstat`.
 
@@ -233,7 +233,7 @@ For more stats, use `samtools stats`.
 samtools stats eg/ERR188273_chrX.bam | grep ^SN
 ```
 
-# samtools calmd/fillmd
+## samtools calmd/fillmd
 
 The `calmd` or `fillmd` tool is useful for visualising mismatches and insertions in an alignment of a read to a reference genome. The `-e` argument changes identical bases between the read and reference into `=`.
 
@@ -243,7 +243,7 @@ samtools view -b eg/ERR188273_chrX.bam | samtools fillmd -e - genome/chrX.fa > e
 head eg/ERR188273_chrX_fillmd.bam
 ```
 
-# Creating FASTQ files from a BAM file
+## Creating FASTQ files from a BAM file
 
 Use the `fastq` tool to create FASTQ files from a BAM file. For paired-end reads, use `-1` and `-2` to create separate FASTA files.
 
@@ -252,7 +252,7 @@ samtools fastq -1 eg/ERR188273_chrX_1.fq -2 eg/ERR188273_chrX_2.fq eg/ERR188273_
 head eg/ERR188273_chrX_1.fq
 ```
 
-# Random subsampling of BAM file
+## Random subsampling of BAM file
 
 The SAMtools view `-s` parameter allows you to randomly sub-sample a BAM file. Using `-s 0.5` will create a new BAM file with a random half of all mapped reads; unmapped reads are not sampled.
 
@@ -260,7 +260,7 @@ The SAMtools view `-s` parameter allows you to randomly sub-sample a BAM file. U
 samtools view -s 0.5 -b eg/ERR188273_chrX.bam > eg/ERR188273_chrX_rand.bam
 ```
 
-# Count number of reads
+## Count number of reads
 
 Use `samtools idxstats` to print stats on a BAM file; this requires an index file which is created by running `samtools index`. The output of idxstats is a file with four tab-delimited columns:
 
@@ -287,7 +287,7 @@ The number of reads, which is the sum of mapped and unmapped reads.
 samtools idxstats eg/ERR188273_chrX.bam | awk '{s+=$3+$4} END {print s}'
 ```
 
-# Obtaining genomic sequence
+## Obtaining genomic sequence
 
 Use `faidx` to fetch genomic sequence; coordinates are 1-based.
 
@@ -303,11 +303,11 @@ Now we can obtain the sequence.
 samtools faidx genome/chrX.fa chrX:300000-300100
 ```
 
-# Comparing BAM files
+## Comparing BAM files
 
 Install [deepTools](https://deeptools.readthedocs.io/en/develop/) and use [bamCompare](https://deeptools.readthedocs.io/en/develop/content/tools/bamCompare.html). The bigWig output file shows the ratio of reads between `b1` and `b2` in 50 bp (default) windows.
 
-# Converting reference names
+## Converting reference names
 
 One of the most annoying bioinformatics problems is the use of different chromosome names, e.g. chr1 vs 1, in different references even when the sequences are identical. The GRCh38 reference downloaded from Ensembl has chromosome names without the `chr`:
 
@@ -342,7 +342,7 @@ samtools reheader eg/my_header eg/ERR188273_chrX.bam > eg/ERR188273_X.bam
 samtools view eg/ERR188273_X.bam | head -2
 ```
 
-# Coverage
+## Coverage
 
 There are several ways to calculate coverage, i.e. count the number of bases mapped to positions on the reference. `samtools depth` will return three columns: reference, position, and coverage.
 
@@ -382,6 +382,6 @@ I have an [old blog post](https://davetang.org/muse/2015/08/26/samtools-mpileup/
 samtools coverage eg/ERR188273_chrX.bam
 ```
 
-# Stargazers over time
+## Stargazers over time
 
 [![Stargazers over time](https://starchart.cc/davetang/learning_bam_file.svg)](https://starchart.cc/davetang/learning_bam_file)
