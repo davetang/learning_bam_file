@@ -28,7 +28,7 @@ Table of Contents
 
 Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
-Wed Jul 21 11:44:40 JST 2021
+Sat 07 Aug 2021 05:49:08 AM UTC
 
 Learning the BAM format
 ================
@@ -40,7 +40,7 @@ SAM/BAM format. The SAM (Sequence Alignment/Map) format (BAM is just the
 binary form of SAM) is currently the *de facto* standard for storing
 large nucleotide sequence alignments. If you are working with
 high-throughput sequencing data, at some point you will probably have to
-deal with SAM/BAM files, so familiarise yourself with them! For the
+deal with SAM/BAM files, so familiarise yourself with them\! For the
 latest information on SAMtools, please refer to the [release
 notes](https://github.com/samtools/samtools/releases).
 
@@ -48,15 +48,22 @@ The examples in this README use the `ERR188273_chrX.bam` BAM file
 (stored in the `eg` folder) generated as per
 <https://github.com/davetang/rnaseq> using the HISAT2 + StringTie2
 RNA-seq pipeline. This README is generated using the `create_readme.sh`
-script; if you want to generate this file yourself, you can try using
-the `Makefile` by running `make` on a Linux-based operating system. (If
-you have Conda installed, please run `conda deactivate` first before
-`make` and if you are using macOS, please refer to the `README.md` in
-`etc`.) This will download the required reference file, compile
-`samtools` (version 1.13), set up `Miniconda3`, `R`, install the
-`Rmarkdown` package, and finally generate this README. It will take some
-time to perform all these steps (and will probably break if you are
-missing some dependency).
+script; if you want to generate this file yourself, please use [this
+Docker image](https://hub.docker.com/repository/docker/davetang/r_build)
+and the `Makefile` in this directory. For example:
+
+``` bash
+# clone this repo
+git clone https://github.com/davetang/learning_bam_file.git
+cd learning_bam_file
+
+docker pull davetang/r_build:4.1.0
+
+docker run --rm -it -v $(pwd):/work davetang/r_build:4.1.0 /bin/bash
+
+# inside the Docker container
+make
+```
 
 # Installing SAMtools
 
@@ -173,7 +180,7 @@ Size of SAM file.
 ls -lh eg/ERR188273_chrX.sam
 ```
 
-    ## -rw-r--r-- 1 dtang dtang 321M Jul 21 11:42 eg/ERR188273_chrX.sam
+    ## -rw-r--r-- 1 root root 321M Aug  7 05:45 eg/ERR188273_chrX.sam
 
 Size of BAM file.
 
@@ -181,7 +188,7 @@ Size of BAM file.
 ls -lh eg/ERR188273_chrX.bam
 ```
 
-    ## -rw-r--r-- 1 dtang dtang 67M Jul 15 13:55 eg/ERR188273_chrX.bam
+    ## -rw-r--r-- 1 root root 67M Jun 21  2020 eg/ERR188273_chrX.bam
 
 We can use `head` to view a SAM file.
 
@@ -231,9 +238,9 @@ samtools view -T genome/chrX.fa -C -o eg/ERR188273_chrX.cram eg/ERR188273_chrX.b
 ls -lh eg/ERR188273_chrX.[sbcr]*am
 ```
 
-    ## -rw-r--r-- 1 dtang dtang  67M Jul 15 13:55 eg/ERR188273_chrX.bam
-    ## -rw-r--r-- 1 dtang dtang  40M Jul 21 11:42 eg/ERR188273_chrX.cram
-    ## -rw-r--r-- 1 dtang dtang 321M Jul 21 11:42 eg/ERR188273_chrX.sam
+    ## -rw-r--r-- 1 root root  67M Jun 21  2020 eg/ERR188273_chrX.bam
+    ## -rw-r--r-- 1 root root  40M Aug  7 05:46 eg/ERR188273_chrX.cram
+    ## -rw-r--r-- 1 root root 321M Aug  7 05:45 eg/ERR188273_chrX.sam
 
 You can use `samtools view` to view a CRAM file just as you would for a
 BAM file.
@@ -270,8 +277,8 @@ ls -l eg/ERR188273_chrX.bam
 ls -l eg/sorted.bam
 ```
 
-    ## -rw-r--r-- 1 dtang dtang 69983526 Jul 15 13:55 eg/ERR188273_chrX.bam
-    ## -rw-r--r-- 1 dtang dtang 69983598 Jul 21 11:42 eg/sorted.bam
+    ## -rw-r--r-- 1 root root 69983526 Jun 21  2020 eg/ERR188273_chrX.bam
+    ## -rw-r--r-- 1 root root 69983598 Aug  7 05:46 eg/sorted.bam
 
 You should use use additional threads (if they are available) to speed
 up sorting; to use four threads, use `-@ 4`.
@@ -283,9 +290,9 @@ time samtools sort eg/ERR188273_chrX.sam -o eg/sorted.bam
 ```
 
     ## 
-    ## real 0m17.879s
-    ## user 0m8.395s
-    ## sys  0m0.679s
+    ## real 0m13.052s
+    ## user 0m10.021s
+    ## sys  0m0.409s
 
 Time taken using four threads.
 
@@ -295,12 +302,12 @@ time samtools sort -@ 4 eg/ERR188273_chrX.sam -o eg/sorted.bam
 
     ## [bam_sort_core] merging from 0 files and 4 in-memory blocks...
     ## 
-    ## real 0m4.373s
-    ## user 0m9.085s
-    ## sys  0m0.390s
+    ## real 0m4.347s
+    ## user 0m11.625s
+    ## sys  0m1.828s
 
 Many of the SAMtools subtools can use additional threads, so make use of
-them if you have the resources!
+them if you have the resources\!
 
 # Creating a BAM index file
 
@@ -583,6 +590,8 @@ idxstats is a file with four tab-delimited columns:
 3.  Number of mapped reads
 4.  Number of unmapped reads
 
+<!-- end list -->
+
 ``` bash
 samtools idxstats eg/ERR188273_chrX.bam
 ```
@@ -720,6 +729,8 @@ additional information:
 6.  Base qualities
 7.  Alignment mapping qualities (when used with `-s`)
 
+<!-- end list -->
+
 ``` bash
 samtools mpileup -f genome/chrX.fa -s eg/ERR188273_chrX.bam | head
 ```
@@ -746,11 +757,13 @@ post](https://davetang.org/muse/2015/08/26/samtools-mpileup/) on using
 2.  startpos - Start position
 3.  endpos - End position (or sequence length)
 4.  numreads - Number reads aligned to the region (after filtering)
-5.  covbases - Number of covered bases with depth >= 1
+5.  covbases - Number of covered bases with depth \>= 1
 6.  coverage - Proportion of covered bases \[0..1\]
 7.  meandepth - Mean depth of coverage
 8.  meanbaseq - Mean base quality in covered region
 9.  meanmapq - Mean mapping quality of selected reads
+
+<!-- end list -->
 
 ``` bash
 samtools coverage eg/ERR188273_chrX.bam
