@@ -29,7 +29,7 @@ jobs:
           git config --global user.email 'davetingpongtang@gmail.com'
           git add "README.md"
           git commit -m "Build README.md"
-          git push origin main
+          git push origin master
 
       - run: echo "This job's status is ${{ job.status }}."
 
