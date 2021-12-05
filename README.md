@@ -28,12 +28,15 @@ Table of Contents
 
 Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
-Sat 07 Aug 2021 06:04:01 AM UTC
+Sun 05 Dec 2021 10:06:02 AM UTC
 
 Learning the BAM format
 ================
 
 ## Introduction
+
+![Build
+README](https://github.com/davetang/learning_bam_file/actions/workflows/create_readme.yml/badge.svg)
 
 SAMtools provides various (sub)tools for manipulating alignments in the
 SAM/BAM format. The SAM (Sequence Alignment/Map) format (BAM is just the
@@ -180,7 +183,7 @@ Size of SAM file.
 ls -lh eg/ERR188273_chrX.sam
 ```
 
-    ## -rw-r--r-- 1 root root 321M Aug  7 06:00 eg/ERR188273_chrX.sam
+    ## -rw-r--r-- 1 root root 321M Dec  5 10:04 eg/ERR188273_chrX.sam
 
 Size of BAM file.
 
@@ -188,7 +191,7 @@ Size of BAM file.
 ls -lh eg/ERR188273_chrX.bam
 ```
 
-    ## -rw-r--r-- 1 root root 67M Jun 21  2020 eg/ERR188273_chrX.bam
+    ## -rw-r--r-- 1 root root 67M Dec  5 10:03 eg/ERR188273_chrX.bam
 
 We can use `head` to view a SAM file.
 
@@ -238,9 +241,9 @@ samtools view -T genome/chrX.fa -C -o eg/ERR188273_chrX.cram eg/ERR188273_chrX.b
 ls -lh eg/ERR188273_chrX.[sbcr]*am
 ```
 
-    ## -rw-r--r-- 1 root root  67M Jun 21  2020 eg/ERR188273_chrX.bam
-    ## -rw-r--r-- 1 root root  40M Aug  7 06:01 eg/ERR188273_chrX.cram
-    ## -rw-r--r-- 1 root root 321M Aug  7 06:00 eg/ERR188273_chrX.sam
+    ## -rw-r--r-- 1 root root  67M Dec  5 10:03 eg/ERR188273_chrX.bam
+    ## -rw-r--r-- 1 root root  40M Dec  5 10:04 eg/ERR188273_chrX.cram
+    ## -rw-r--r-- 1 root root 321M Dec  5 10:04 eg/ERR188273_chrX.sam
 
 You can use `samtools view` to view a CRAM file just as you would for a
 BAM file.
@@ -277,8 +280,8 @@ ls -l eg/ERR188273_chrX.bam
 ls -l eg/sorted.bam
 ```
 
-    ## -rw-r--r-- 1 root root 69983526 Jun 21  2020 eg/ERR188273_chrX.bam
-    ## -rw-r--r-- 1 root root 69983598 Aug  7 06:01 eg/sorted.bam
+    ## -rw-r--r-- 1 root root 69983526 Dec  5 10:03 eg/ERR188273_chrX.bam
+    ## -rw-r--r-- 1 root root 69983598 Dec  5 10:04 eg/sorted.bam
 
 You should use use additional threads (if they are available) to speed
 up sorting; to use four threads, use `-@ 4`.
@@ -290,9 +293,9 @@ time samtools sort eg/ERR188273_chrX.sam -o eg/sorted.bam
 ```
 
     ## 
-    ## real 0m13.312s
-    ## user 0m10.047s
-    ## sys  0m0.464s
+    ## real 0m9.338s
+    ## user 0m8.835s
+    ## sys  0m0.240s
 
 Time taken using four threads.
 
@@ -302,9 +305,9 @@ time samtools sort -@ 4 eg/ERR188273_chrX.sam -o eg/sorted.bam
 
     ## [bam_sort_core] merging from 0 files and 4 in-memory blocks...
     ## 
-    ## real 0m4.872s
-    ## user 0m12.792s
-    ## sys  0m2.157s
+    ## real 0m4.844s
+    ## user 0m8.919s
+    ## sys  0m0.315s
 
 Many of the SAMtools subtools can use additional threads, so make use of
 them if you have the resources\!
