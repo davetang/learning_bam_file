@@ -1,8 +1,14 @@
 # name of workflow that will be displayed on the actions page
 name: Create README.md
 
-# event that will cause the workflow to be executed
-on: [push]
+# execute workflow only when these files are modified
+on:
+  push:
+    paths:
+      - 'eg/**'
+      - 'Makefile'
+      - 'create_readme.sh'
+      - 'learning_bam_file.Rmd'
 
 # a list of the jobs that run as part of the workflow
 jobs:
