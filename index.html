@@ -18,7 +18,7 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "Learning the BAM format";
+    var mkdocs_page_name = "Home";
     var mkdocs_page_input_path = "index.md";
     var mkdocs_page_url = null;
   </script>
@@ -47,7 +47,7 @@
 
       <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
                 <ul class="current">
-                    <li class="toctree-l1 current"><a class="reference internal current" href=".">Learning the BAM format</a>
+                    <li class="toctree-l1 current"><a class="reference internal current" href=".">Home</a>
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a>
     </li>
@@ -117,7 +117,7 @@
     
       
     
-    <li>Learning the BAM format</li>
+    <li>Home</li>
     <li class="wy-breadcrumbs-aside">
       
     </li>
@@ -131,6 +131,8 @@
               
                 <h1 id="learning-the-bam-format">Learning the BAM format</h1>
 <h2 id="introduction">Introduction</h2>
+<p><img alt="Build
+README" src="https://github.com/davetang/learning_bam_file/actions/workflows/create_readme.yml/badge.svg" /></p>
 <p>SAMtools provides various (sub)tools for manipulating alignments in the
 SAM/BAM format. The SAM (Sequence Alignment/Map) format (BAM is just the
 binary form of SAM) is currently the <em>de facto</em> standard for storing
@@ -150,9 +152,8 @@ and the <code>Makefile</code> in this directory. For example:</p>
 git clone https://github.com/davetang/learning_bam_file.git
 cd learning_bam_file
 
-docker pull davetang/r_build:4.1.0
-
-docker run --rm -it -v $(pwd):/work davetang/r_build:4.1.0 /bin/bash
+docker pull davetang/r_build:4.1.2
+docker run --rm -it -v $(pwd):/work davetang/r_build:4.1.2 /bin/bash
 
 # inside the Docker container
 make
@@ -176,7 +177,7 @@ if you want to find learn more.</p>
 </code></pre>
 <pre><code>## 
 ## Program: samtools (Tools for alignments in the SAM format)
-## Version: 1.13 (using htslib 1.13)
+## Version: 1.14 (using htslib 1.14)
 ## 
 ## Usage:   samtools &lt;command&gt; [options]
 ## 
@@ -223,6 +224,7 @@ if you want to find learn more.</p>
 ##      tview          text alignment viewer
 ##      view           SAM&lt;-&gt;BAM&lt;-&gt;CRAM conversion
 ##      depad          convert padded BAM to unpadded BAM
+##      samples        list the samples in a set of SAM/BAM/CRAM files
 ## 
 ##   -- Misc
 ##      help [cmd]     display this help message or help for [cmd]
@@ -249,12 +251,12 @@ and are faster to process.</p>
 <p>Size of SAM file.</p>
 <pre><code class="language-bash">ls -lh eg/ERR188273_chrX.sam
 </code></pre>
-<pre><code>## -rw-r--r-- 1 root root 321M Aug  7 06:00 eg/ERR188273_chrX.sam
+<pre><code>## -rw-r--r-- 1 root root 321M Dec  8 04:43 eg/ERR188273_chrX.sam
 </code></pre>
 <p>Size of BAM file.</p>
 <pre><code class="language-bash">ls -lh eg/ERR188273_chrX.bam
 </code></pre>
-<pre><code>## -rw-r--r-- 1 root root 67M Jun 21  2020 eg/ERR188273_chrX.bam
+<pre><code>## -rw-r--r-- 1 root root 67M Dec  8 04:41 eg/ERR188273_chrX.bam
 </code></pre>
 <p>We can use <code>head</code> to view a SAM file.</p>
 <pre><code class="language-bash">head eg/ERR188273_chrX.sam
@@ -262,7 +264,7 @@ and are faster to process.</p>
 <pre><code>## @HD  VN:1.0  SO:coordinate
 ## @SQ  SN:chrX LN:156040895
 ## @PG  ID:hisat2   PN:hisat2   VN:2.2.0    CL:"/Users/dtang/github/rnaseq/hisat2/../src/hisat2-2.2.0/hisat2-align-s --wrapper basic-0 --dta -p 4 -x ../raw/chrX_data/indexes/chrX_tran -1 /tmp/4195.inpipe1 -2 /tmp/4195.inpipe2"
-## @PG  ID:samtools PN:samtools PP:hisat2   VN:1.13 CL:samtools view -h eg/ERR188273_chrX.bam
+## @PG  ID:samtools PN:samtools PP:hisat2   VN:1.14 CL:samtools view -h eg/ERR188273_chrX.bam
 ## ERR188273.4711308    73  chrX    21649   0   5S70M   =   21649   0   CGGGTGATCACGAGGTCAGGAGATCAAGACCATCCTGGCCAACACAGTGAAACCCCATCTCTACTAAAAATACAA @@@F=DDFFHGHBHIFFHIGGIFGEGHFHIGIGIFIIIGIGIGGDHIIGIIC@&gt;DGHCHHHGHHFFFFFDEACC@ AS:i:-5 ZS:i:-5 XN:i:0  XM:i:0  XO:i:0  XG:i:0  NM:i:0  MD:Z:70 YT:Z:UP NH:i:2
 ## ERR188273.4711308    133 chrX    21649   0   *   =   21649   0   CTACAGGTGCCCGCCACCATGCCCAGCTAATTTTTTTTGTATTTTTAGTAGAGATGGGGTTTCACTGTGTTGGCC CB@FDFFFHHGFHIJJJJIIIIIIIGGGIJGIIJJJJJJFFHIIIIGECHEHHGGHHFF?AACCDDDDDDDDBCD YT:Z:UP
 ## ERR188273.4711308    329 chrX    233717  0   5S70M   =   233717  0   CGGGTGATCACGAGGTCAGGAGATCAAGACCATCCTGGCCAACACAGTGAAACCCCATCTCTACTAAAAATACAA @@@F=DDFFHGHBHIFFHIGGIFGEGHFHIGIGIFIIIGIGIGGDHIIGIIC@&gt;DGHCHHHGHHFFFFFDEACC@ AS:i:-5 ZS:i:-5 XN:i:0  XM:i:0  XO:i:0  XG:i:0  NM:i:0  MD:Z:70 YT:Z:UP NH:i:2
@@ -291,9 +293,9 @@ and <code>-C</code> arguments to convert a BAM file into CRAM.</p>
 
 ls -lh eg/ERR188273_chrX.[sbcr]*am
 </code></pre>
-<pre><code>## -rw-r--r-- 1 root root  67M Jun 21  2020 eg/ERR188273_chrX.bam
-## -rw-r--r-- 1 root root  40M Aug  7 06:01 eg/ERR188273_chrX.cram
-## -rw-r--r-- 1 root root 321M Aug  7 06:00 eg/ERR188273_chrX.sam
+<pre><code>## -rw-r--r-- 1 root root  67M Dec  8 04:41 eg/ERR188273_chrX.bam
+## -rw-r--r-- 1 root root  40M Dec  8 04:43 eg/ERR188273_chrX.cram
+## -rw-r--r-- 1 root root 321M Dec  8 04:43 eg/ERR188273_chrX.sam
 </code></pre>
 <p>You can use <code>samtools view</code> to view a CRAM file just as you would for a
 BAM file.</p>
@@ -322,8 +324,8 @@ sorted BAM file from a SAM file.</p>
 ls -l eg/ERR188273_chrX.bam
 ls -l eg/sorted.bam
 </code></pre>
-<pre><code>## -rw-r--r-- 1 root root 69983526 Jun 21  2020 eg/ERR188273_chrX.bam
-## -rw-r--r-- 1 root root 69983598 Aug  7 06:01 eg/sorted.bam
+<pre><code>## -rw-r--r-- 1 root root 69983526 Dec  8 04:41 eg/ERR188273_chrX.bam
+## -rw-r--r-- 1 root root 69983598 Dec  8 04:43 eg/sorted.bam
 </code></pre>
 <p>You should use use additional threads (if they are available) to speed
 up sorting; to use four threads, use <code>-@ 4</code>.</p>
@@ -331,18 +333,18 @@ up sorting; to use four threads, use <code>-@ 4</code>.</p>
 <pre><code class="language-bash">time samtools sort eg/ERR188273_chrX.sam -o eg/sorted.bam
 </code></pre>
 <pre><code>## 
-## real 0m13.312s
-## user 0m10.047s
-## sys  0m0.464s
+## real 0m11.026s
+## user 0m10.445s
+## sys  0m0.304s
 </code></pre>
 <p>Time taken using four threads.</p>
 <pre><code class="language-bash">time samtools sort -@ 4 eg/ERR188273_chrX.sam -o eg/sorted.bam
 </code></pre>
 <pre><code>## [bam_sort_core] merging from 0 files and 4 in-memory blocks...
 ## 
-## real 0m4.872s
-## user 0m12.792s
-## sys  0m2.157s
+## real 0m5.820s
+## user 0m10.862s
+## sys  0m0.339s
 </code></pre>
 <p>Many of the SAMtools subtools can use additional threads, so make use of
 them if you have the resources!</p>
@@ -526,8 +528,8 @@ head eg/ERR188273_chrX_fillmd.bam
 <pre><code>## @HD  VN:1.0  SO:coordinate
 ## @SQ  SN:chrX LN:156040895
 ## @PG  ID:hisat2   PN:hisat2   VN:2.2.0    CL:"/Users/dtang/github/rnaseq/hisat2/../src/hisat2-2.2.0/hisat2-align-s --wrapper basic-0 --dta -p 4 -x ../raw/chrX_data/indexes/chrX_tran -1 /tmp/4195.inpipe1 -2 /tmp/4195.inpipe2"
-## @PG  ID:samtools PN:samtools PP:hisat2   VN:1.13 CL:samtools view -b eg/ERR188273_chrX.bam
-## @PG  ID:samtools.1   PN:samtools PP:samtools VN:1.13 CL:samtools fillmd -e - genome/chrX.fa
+## @PG  ID:samtools PN:samtools PP:hisat2   VN:1.14 CL:samtools view -b eg/ERR188273_chrX.bam
+## @PG  ID:samtools.1   PN:samtools PP:samtools VN:1.14 CL:samtools fillmd -e - genome/chrX.fa
 ## ERR188273.4711308    73  chrX    21649   0   5S70M   =   21649   0   CGGGT====================================================================== @@@F=DDFFHGHBHIFFHIGGIFGEGHFHIGIGIFIIIGIGIGGDHIIGIIC@&gt;DGHCHHHGHHFFFFFDEACC@ AS:i:-5 ZS:i:-5 XN:i:0  XM:i:0  XO:i:0  XG:i:0  NM:i:0  MD:Z:70 YT:Z:UP NH:i:2
 ## ERR188273.4711308    133 chrX    21649   0   *   =   21649   0   CTACAGGTGCCCGCCACCATGCCCAGCTAATTTTTTTTGTATTTTTAGTAGAGATGGGGTTTCACTGTGTTGGCC CB@FDFFFHHGFHIJJJJIIIIIIIGGGIJGIIJJJJJJFFHIIIIGECHEHHGGHHFF?AACCDDDDDDDDBCD YT:Z:UP
 ## ERR188273.4711308    329 chrX    233717  0   5S70M   =   233717  0   CGGGT====================================================================== @@@F=DDFFHGHBHIFFHIGGIFGEGHFHIGIGIFIIIGIGIGGDHIIGIIC@&gt;DGHCHHHGHHFFFFFDEACC@ AS:i:-5 ZS:i:-5 XN:i:0  XM:i:0  XO:i:0  XG:i:0  NM:i:0  MD:Z:70 YT:Z:UP NH:i:2
@@ -629,7 +631,7 @@ just make sure your reference sequences are actually identical.</p>
 <pre><code>## @HD  VN:1.0  SO:coordinate
 ## @SQ  SN:chrX LN:156040895
 ## @PG  ID:hisat2   PN:hisat2   VN:2.2.0    CL:"/Users/dtang/github/rnaseq/hisat2/../src/hisat2-2.2.0/hisat2-align-s --wrapper basic-0 --dta -p 4 -x ../raw/chrX_data/indexes/chrX_tran -1 /tmp/4195.inpipe1 -2 /tmp/4195.inpipe2"
-## @PG  ID:samtools PN:samtools PP:hisat2   VN:1.13 CL:samtools view -H eg/ERR188273_chrX.bam
+## @PG  ID:samtools PN:samtools PP:hisat2   VN:1.14 CL:samtools view -H eg/ERR188273_chrX.bam
 </code></pre>
 <p>Substitute header with new name.</p>
 <pre><code class="language-bash">samtools view -H eg/ERR188273_chrX.bam | sed 's/SN:chrX/SN:X/' &gt; eg/my_header
@@ -755,6 +757,6 @@ time" src="https://starchart.cc/davetang/learning_bam_file.svg" /></a></p>
 </html>
 
 <!--
-MkDocs version : 1.2.2
-Build Date UTC : 2021-08-07 06:10:03.834026+00:00
+MkDocs version : 1.2.3
+Build Date UTC : 2021-12-08 04:45:06.875521+00:00
 -->
