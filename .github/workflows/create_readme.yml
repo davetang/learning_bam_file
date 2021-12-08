@@ -40,6 +40,7 @@ jobs:
       - name: Deploy MkDocs
         run: |
           git branch gh-pages
+          git pull
           cd mkdocs && mkdocs gh-deploy
 
       - run: echo "This job's status is ${{ job.status }}."
