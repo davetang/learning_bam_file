@@ -28,7 +28,7 @@ Table of Contents
 
 Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
-Mon 21 Feb 2022 11:39:52 PM UTC
+Mon 07 Mar 2022 06:59:39 AM UTC
 
 Learning the BAM format
 ================
@@ -185,7 +185,7 @@ Size of SAM file.
 ls -lh eg/ERR188273_chrX.sam
 ```
 
-    ## -rw-r--r-- 1 root root 321M Feb 21 23:37 eg/ERR188273_chrX.sam
+    ## -rw-r--r-- 1 root root 321M Mar  7 06:57 eg/ERR188273_chrX.sam
 
 Size of BAM file.
 
@@ -193,7 +193,7 @@ Size of BAM file.
 ls -lh eg/ERR188273_chrX.bam
 ```
 
-    ## -rw-r--r-- 1 root root 67M Feb 21 23:36 eg/ERR188273_chrX.bam
+    ## -rw-r--r-- 1 root root 67M Mar  7 06:56 eg/ERR188273_chrX.bam
 
 We can use `head` to view a SAM file.
 
@@ -243,9 +243,9 @@ samtools view -T genome/chrX.fa -C -o eg/ERR188273_chrX.cram eg/ERR188273_chrX.b
 ls -lh eg/ERR188273_chrX.[sbcr]*am
 ```
 
-    ## -rw-r--r-- 1 root root  67M Feb 21 23:36 eg/ERR188273_chrX.bam
-    ## -rw-r--r-- 1 root root  40M Feb 21 23:38 eg/ERR188273_chrX.cram
-    ## -rw-r--r-- 1 root root 321M Feb 21 23:37 eg/ERR188273_chrX.sam
+    ## -rw-r--r-- 1 root root  67M Mar  7 06:56 eg/ERR188273_chrX.bam
+    ## -rw-r--r-- 1 root root  40M Mar  7 06:58 eg/ERR188273_chrX.cram
+    ## -rw-r--r-- 1 root root 321M Mar  7 06:57 eg/ERR188273_chrX.sam
 
 You can use `samtools view` to view a CRAM file just as you would for a
 BAM file.
@@ -282,8 +282,8 @@ ls -l eg/ERR188273_chrX.bam
 ls -l eg/sorted.bam
 ```
 
-    ## -rw-r--r-- 1 root root 69983526 Feb 21 23:36 eg/ERR188273_chrX.bam
-    ## -rw-r--r-- 1 root root 69983598 Feb 21 23:38 eg/sorted.bam
+    ## -rw-r--r-- 1 root root 69983526 Mar  7 06:56 eg/ERR188273_chrX.bam
+    ## -rw-r--r-- 1 root root 69983598 Mar  7 06:58 eg/sorted.bam
 
 You should use use additional threads (if they are available) to speed
 up sorting; to use four threads, use `-@ 4`.
@@ -295,9 +295,9 @@ time samtools sort eg/ERR188273_chrX.sam -o eg/sorted.bam
 ```
 
     ## 
-    ## real 0m11.737s
-    ## user 0m11.313s
-    ## sys  0m0.332s
+    ## real 0m10.590s
+    ## user 0m10.103s
+    ## sys  0m0.228s
 
 Time taken using four threads.
 
@@ -307,9 +307,9 @@ time samtools sort -@ 4 eg/ERR188273_chrX.sam -o eg/sorted.bam
 
     ## [bam_sort_core] merging from 0 files and 4 in-memory blocks...
     ## 
-    ## real 0m6.400s
-    ## user 0m11.873s
-    ## sys  0m0.373s
+    ## real 0m5.531s
+    ## user 0m10.199s
+    ## sys  0m0.365s
 
 Many of the SAMtools subtools can use additional threads, so make use of
 them if you have the resources\!
@@ -356,6 +356,14 @@ samtools flags
     ##  0x200   512  QCFAIL         not passing quality controls or other filters
     ##  0x400  1024  DUP            PCR or optical duplicate
     ##  0x800  2048  SUPPLEMENTARY  supplementary alignment
+
+Find out about a `73` flag.
+
+``` bash
+samtools flags 73
+```
+
+    ## 0x49 73  PAIRED,MUNMAP,READ1
 
 ## Filtering unmapped reads
 
@@ -751,6 +759,35 @@ samtools mpileup -f genome/chrX.fa -s eg/ERR188273_chrX.bam | head
     ## chrX 251278  g   1   .   D   ]
     ## chrX 251279  g   1   .   F   ]
     ## chrX 251280  g   1   .   B   ]
+
+Note that the start of the `samtools mpileup` output differ from the
+start of the `samtools depth` output. This is because `mpileup` performs
+some filtering by default. In the case of this example, read pairs that
+are not both mapped will be ignored. To count these “orphan” reads, use
+the `--count-orphans` argument.
+
+``` bash
+samtools mpileup -f genome/chrX.fa --count-orphans -s eg/ERR188273_chrX.bam | head
+```
+
+    ## [mpileup] 1 samples in 1 input files
+    ## chrX 21649   g   0   *   *   *
+    ## chrX 21650   a   1   .   D   !
+    ## chrX 21651   t   1   .   F   !
+    ## chrX 21652   c   1   .   F   !
+    ## chrX 21653   a   1   .   H   !
+    ## chrX 21654   c   1   .   G   !
+    ## chrX 21655   g   1   .   H   !
+    ## chrX 21656   a   1   .   B   !
+    ## chrX 21657   g   1   .   H   !
+    ## chrX 21658   g   1   .   I   !
+
+In addition `mpileup` performs “per-Base Alignment Quality” (BAQ) by
+default and will adjust base quality scores. The default behaviour to to
+skip bases with baseQ/BAQ smaller than 13. If you are finding
+discrepancies between `mpileup`’s coverage calculation with another
+coverage tool, you can either set `--min-BQ` to `0` or use `--no-BAQ` to
+disable BAQ.
 
 I have an [old blog
 post](https://davetang.org/muse/2015/08/26/samtools-mpileup/) on using
