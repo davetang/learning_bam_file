@@ -158,6 +158,12 @@ The second column in a SAM/BAM file is the flag column; use the `flags` subcomma
 samtools flags
 ```
 
+Find out about a `73` flag.
+
+```{bash engine.opts='-l'}
+samtools flags 73
+```
+
 ## Filtering unmapped reads
 
 Use `-F 4` to filter out unmapped reads.
@@ -364,6 +370,14 @@ The `samtools mpileup` command can also provide depth information (but not for r
 ```{bash engine.opts='-l'}
 samtools mpileup -f genome/chrX.fa -s eg/ERR188273_chrX.bam | head
 ```
+
+Note that the start of the `samtools mpileup` output differ from the start of the `samtools depth` output. This is because `mpileup` performs some filtering by default. In the case of this example, read pairs that are not both mapped will be ignored. To count these "orphan" reads, use the `--count-orphans` argument.
+
+```{bash engine.opts='-l'}
+samtools mpileup -f genome/chrX.fa --count-orphans -s eg/ERR188273_chrX.bam | head
+```
+
+In addition `mpileup` performs "per-Base Alignment Quality" (BAQ) by default and will adjust base quality scores. The default behaviour to to skip bases with baseQ/BAQ smaller than 13. If you are finding discrepancies between `mpileup`'s coverage calculation with another coverage tool, you can either set `--min-BQ` to `0` or use `--no-BAQ` to disable BAQ.
 
 I have an [old blog post](https://davetang.org/muse/2015/08/26/samtools-mpileup/) on using `mpileup`.
 
