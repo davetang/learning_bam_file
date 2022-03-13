@@ -11,6 +11,7 @@ Table of Contents
    * [Converting a BAM file to a CRAM file](#converting-a-bam-file-to-a-cram-file)
    * [Sorting a SAM/BAM file](#sorting-a-sambam-file)
    * [Creating a BAM index file](#creating-a-bam-index-file)
+   * [Adding read groups](#adding-read-groups)
    * [Interpreting the BAM flags](#interpreting-the-bam-flags)
    * [Filtering unmapped reads](#filtering-unmapped-reads)
    * [Extracting entries mapping to a specific loci](#extracting-entries-mapping-to-a-specific-loci)
@@ -28,7 +29,7 @@ Table of Contents
 
 Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
-Mon 07 Mar 2022 06:59:39 AM UTC
+Sun 13 Mar 2022 08:45:04 AM UTC
 
 Learning the BAM format
 ================
@@ -82,6 +83,33 @@ Once you have installed Miniconda, you can install SAMtools as follows:
 
 ``` bash
 conda install -c bioconda samtools
+```
+
+Otherwise you can download the source and compile it yourself; change
+`dir` to the location you want `samtools` to be installed. `samtools`
+will be installed in `${dir}/bin`, so make sure this is in your `$PATH`.
+
+``` bash
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+ver=1.15
+tool=samtools
+url=https://github.com/samtools/${tool}/releases/download/${ver}/${tool}-${ver}.tar.bz2
+dir=${HOME}/local
+
+wget ${url}
+tar xjf ${tool}-${ver}.tar.bz2
+cd ${tool}-${ver}
+./configure --prefix=${dir}
+make && make install
+cd ..
+
+rm -rf ${tool}-${ver} ${tool}-${ver}.tar.bz2
+
+>&2 echo Done
+exit 0
 ```
 
 ## Basic usage
@@ -185,7 +213,7 @@ Size of SAM file.
 ls -lh eg/ERR188273_chrX.sam
 ```
 
-    ## -rw-r--r-- 1 root root 321M Mar  7 06:57 eg/ERR188273_chrX.sam
+    ## -rw-r--r-- 1 root root 321M Mar 13 08:42 eg/ERR188273_chrX.sam
 
 Size of BAM file.
 
@@ -193,7 +221,7 @@ Size of BAM file.
 ls -lh eg/ERR188273_chrX.bam
 ```
 
-    ## -rw-r--r-- 1 root root 67M Mar  7 06:56 eg/ERR188273_chrX.bam
+    ## -rw-r--r-- 1 root root 67M Mar 13 08:40 eg/ERR188273_chrX.bam
 
 We can use `head` to view a SAM file.
 
@@ -243,9 +271,9 @@ samtools view -T genome/chrX.fa -C -o eg/ERR188273_chrX.cram eg/ERR188273_chrX.b
 ls -lh eg/ERR188273_chrX.[sbcr]*am
 ```
 
-    ## -rw-r--r-- 1 root root  67M Mar  7 06:56 eg/ERR188273_chrX.bam
-    ## -rw-r--r-- 1 root root  40M Mar  7 06:58 eg/ERR188273_chrX.cram
-    ## -rw-r--r-- 1 root root 321M Mar  7 06:57 eg/ERR188273_chrX.sam
+    ## -rw-r--r-- 1 root root  67M Mar 13 08:40 eg/ERR188273_chrX.bam
+    ## -rw-r--r-- 1 root root  40M Mar 13 08:42 eg/ERR188273_chrX.cram
+    ## -rw-r--r-- 1 root root 321M Mar 13 08:42 eg/ERR188273_chrX.sam
 
 You can use `samtools view` to view a CRAM file just as you would for a
 BAM file.
@@ -282,8 +310,8 @@ ls -l eg/ERR188273_chrX.bam
 ls -l eg/sorted.bam
 ```
 
-    ## -rw-r--r-- 1 root root 69983526 Mar  7 06:56 eg/ERR188273_chrX.bam
-    ## -rw-r--r-- 1 root root 69983598 Mar  7 06:58 eg/sorted.bam
+    ## -rw-r--r-- 1 root root 69983526 Mar 13 08:40 eg/ERR188273_chrX.bam
+    ## -rw-r--r-- 1 root root 69983598 Mar 13 08:43 eg/sorted.bam
 
 You should use use additional threads (if they are available) to speed
 up sorting; to use four threads, use `-@ 4`.
@@ -295,9 +323,9 @@ time samtools sort eg/ERR188273_chrX.sam -o eg/sorted.bam
 ```
 
     ## 
-    ## real 0m10.590s
-    ## user 0m10.103s
-    ## sys  0m0.228s
+    ## real 0m12.245s
+    ## user 0m11.872s
+    ## sys  0m0.272s
 
 Time taken using four threads.
 
@@ -307,9 +335,9 @@ time samtools sort -@ 4 eg/ERR188273_chrX.sam -o eg/sorted.bam
 
     ## [bam_sort_core] merging from 0 files and 4 in-memory blocks...
     ## 
-    ## real 0m5.531s
-    ## user 0m10.199s
-    ## sys  0m0.365s
+    ## real 0m6.512s
+    ## user 0m12.148s
+    ## sys  0m0.350s
 
 Many of the SAMtools subtools can use additional threads, so make use of
 them if you have the resources\!
@@ -322,6 +350,64 @@ can be used for visualising BAM files.
 ``` bash
 samtools index eg/ERR188273_chrX.bam
 ```
+
+## Adding read groups
+
+Some tools like GATK and Picard require [read
+groups](https://gatk.broadinstitute.org/hc/en-us/articles/360035890671-Read-groups)
+(RG). You can add or replace read groups using `samtools addreplacerg`.
+
+``` bash
+samtools addreplacerg -r "@RG\tID:ERR188273\tSM:ERR188273\tPL:illumina" -o eg/ERR188273_chrX_rg.bam eg/ERR188273_chrX.bam
+samtools head eg/ERR188273_chrX_rg.bam
+```
+
+    ## @HD  VN:1.0  SO:coordinate
+    ## @SQ  SN:chrX LN:156040895
+    ## @PG  ID:hisat2   PN:hisat2   VN:2.2.0    CL:"/Users/dtang/github/rnaseq/hisat2/../src/hisat2-2.2.0/hisat2-align-s --wrapper basic-0 --dta -p 4 -x ../raw/chrX_data/indexes/chrX_tran -1 /tmp/4195.inpipe1 -2 /tmp/4195.inpipe2"
+    ## @PG  ID:samtools PN:samtools PP:hisat2   VN:1.15 CL:samtools addreplacerg -r @RG\tID:ERR188273\tSM:ERR188273\tPL:illumina -o eg/ERR188273_chrX_rg.bam eg/ERR188273_chrX.bam
+    ## @RG  ID:ERR188273    SM:ERR188273    PL:illumina
+
+If you want to replace existing read groups, just use the same command.
+
+``` bash
+samtools addreplacerg -r "@RG\tID:ERR188273_2\tSM:ERR188273_2\tPL:illumina_2" -o eg/ERR188273_chrX_rg2.bam eg/ERR188273_chrX_rg.bam
+samtools head eg/ERR188273_chrX_rg2.bam
+```
+
+    ## @HD  VN:1.0  SO:coordinate
+    ## @SQ  SN:chrX LN:156040895
+    ## @PG  ID:hisat2   PN:hisat2   VN:2.2.0    CL:"/Users/dtang/github/rnaseq/hisat2/../src/hisat2-2.2.0/hisat2-align-s --wrapper basic-0 --dta -p 4 -x ../raw/chrX_data/indexes/chrX_tran -1 /tmp/4195.inpipe1 -2 /tmp/4195.inpipe2"
+    ## @PG  ID:samtools PN:samtools PP:hisat2   VN:1.15 CL:samtools addreplacerg -r @RG\tID:ERR188273\tSM:ERR188273\tPL:illumina -o eg/ERR188273_chrX_rg.bam eg/ERR188273_chrX.bam
+    ## @PG  ID:samtools.1   PN:samtools PP:samtools VN:1.15 CL:samtools addreplacerg -r @RG\tID:ERR188273_2\tSM:ERR188273_2\tPL:illumina_2 -o eg/ERR188273_chrX_rg2.bam eg/ERR188273_chrX_rg.bam
+    ## @RG  ID:ERR188273_2  SM:ERR188273_2  PL:illumina_2
+
+Popular alignment tools such as BWA MEM and STAR can add read groups;
+use the `-R` and `--outSAMattrRGline` parameters for the respective
+tool.
+
+    bwa mem \
+      -M \
+      -t ${thread} \
+      -R "@RG\tID:${sample_name}\tSM:${sample}\tPL:${platform}" \
+      ${fasta} \
+      ${fastq1} \
+      ${fastq2} |
+      samtools sort -@ ${thread} -O BAM |\
+      tee ${sample_name}.bam |\
+      samtools index - ${sample_name}.bam.bai
+    
+    STAR \
+      --runMode alignReads \
+      --genomeDir ${star_index} \
+      --readFilesIn ${fastq1} ${fastq2} \
+      --readFilesCommand "gunzip -c" \
+      --outFileNamePrefix ${prefix}. \
+      --outSAMtype BAM Unsorted \
+      --twopassMode Basic \
+      --outSAMattrRGline ID:${id} PL:Illumina PU:${pu} LB:${lb} PI:0 SM:${sm} \
+      --outSAMattributes NH HI AS nM NM ch \
+      --runThreadN ${num_threads}
 
 ## Interpreting the BAM flags
 
