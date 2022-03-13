@@ -38,6 +38,31 @@ Once you have installed Miniconda, you can install SAMtools as follows:
 conda install -c bioconda samtools
 ```
 
+Otherwise you can download the source and compile it yourself; change `dir` to the location you want `samtools` to be installed. `samtools` will be installed in `${dir}/bin`, so make sure this is in your `$PATH`.
+
+```bash
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+ver=1.15
+tool=samtools
+url=https://github.com/samtools/${tool}/releases/download/${ver}/${tool}-${ver}.tar.bz2
+dir=${HOME}/local
+
+wget ${url}
+tar xjf ${tool}-${ver}.tar.bz2
+cd ${tool}-${ver}
+./configure --prefix=${dir}
+make && make install
+cd ..
+
+rm -rf ${tool}-${ver} ${tool}-${ver}.tar.bz2
+
+>&2 echo Done
+exit 0
+```
+
 ## Basic usage
 
 If you run `samtools` on the terminal without any parameters or with `--help`, all the available utilities are listed:
@@ -148,6 +173,49 @@ Various tools require BAM index files, such as IGV, which is a tool that can be 
 
 ```{bash engine.opts='-l'}
 samtools index eg/ERR188273_chrX.bam
+```
+
+## Adding read groups
+
+Some tools like GATK and Picard require [read groups](https://gatk.broadinstitute.org/hc/en-us/articles/360035890671-Read-groups) (RG). You can add or replace read groups using `samtools addreplacerg`.
+
+```{bash engine.opts='-l'}
+samtools addreplacerg -r "@RG\tID:ERR188273\tSM:ERR188273\tPL:illumina" -o eg/ERR188273_chrX_rg.bam eg/ERR188273_chrX.bam
+samtools head eg/ERR188273_chrX_rg.bam
+```
+
+If you want to replace existing read groups, just use the same command.
+
+```{bash engine.opts='-l'}
+samtools addreplacerg -r "@RG\tID:ERR188273_2\tSM:ERR188273_2\tPL:illumina_2" -o eg/ERR188273_chrX_rg2.bam eg/ERR188273_chrX_rg.bam
+samtools head eg/ERR188273_chrX_rg2.bam
+```
+
+Popular alignment tools such as BWA MEM and STAR can add read groups; use the `-R` and `--outSAMattrRGline` parameters for the respective tool.
+
+```
+bwa mem \
+  -M \
+  -t ${thread} \
+  -R "@RG\tID:${sample_name}\tSM:${sample}\tPL:${platform}" \
+  ${fasta} \
+  ${fastq1} \
+  ${fastq2} |
+  samtools sort -@ ${thread} -O BAM |\
+  tee ${sample_name}.bam |\
+  samtools index - ${sample_name}.bam.bai
+
+STAR \
+  --runMode alignReads \
+  --genomeDir ${star_index} \
+  --readFilesIn ${fastq1} ${fastq2} \
+  --readFilesCommand "gunzip -c" \
+  --outFileNamePrefix ${prefix}. \
+  --outSAMtype BAM Unsorted \
+  --twopassMode Basic \
+  --outSAMattrRGline ID:${id} PL:Illumina PU:${pu} LB:${lb} PI:0 SM:${sm} \
+  --outSAMattributes NH HI AS nM NM ch \
+  --runThreadN ${num_threads}
 ```
 
 ## Interpreting the BAM flags
