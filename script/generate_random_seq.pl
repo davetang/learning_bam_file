@@ -3,23 +3,26 @@
 use strict;
 use warnings;
 
-my $usage = "Usage: $0 <bp> <seed>\n";
+my $usage = "Usage: $0 <num> <bp> <seed>\n";
 my $num = shift or die $usage;
+my $len = shift or die $usage;
 my $seed = shift or die $usage;
 
-#set seed for reproducibility
+# set seed for reproducibility
 srand($seed);
 
-my $random_seq = random_seq($num);
-print ">$num | $seed\n$random_seq\n";
+foreach my $i (1 .. $num){
+   my $random_seq = random_seq($len);
+   print ">${i}\n$random_seq\n";
+}
 
 exit(0);
 
 sub random_seq {
-   my ($num) = @_;
+   my ($len) = @_;
    my @nuc = qw/ A C G T /;
    my $seq = '';
-   for (1 .. $num){
+   for (1 .. $len){
       my $rand_ind = int(rand(scalar(@nuc)));
       $seq .= $nuc[$rand_ind];
    }
