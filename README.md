@@ -13,8 +13,8 @@ Table of Contents
    * [Creating a BAM index file](#creating-a-bam-index-file)
    * [Adding read groups](#adding-read-groups)
    * [Interpreting the BAM flags](#interpreting-the-bam-flags)
-   * [Filtering unmapped reads](#filtering-unmapped-reads)
       * [Proper pair](#proper-pair)
+   * [Filtering unmapped reads](#filtering-unmapped-reads)
    * [Extracting entries mapping to a specific loci](#extracting-entries-mapping-to-a-specific-loci)
    * [Extracting only the first read from paired end BAM files](#extracting-only-the-first-read-from-paired-end-bam-files)
    * [Stats](#stats)
@@ -30,7 +30,7 @@ Table of Contents
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
 
-Mon 18 Apr 2022 08:45:56 AM UTC
+Mon 18 Apr 2022 12:22:48 PM UTC
 
 Learning the BAM format
 ================
@@ -214,7 +214,7 @@ Size of SAM file.
 ls -lh eg/ERR188273_chrX.sam
 ```
 
-    ## -rw-r--r-- 1 root root 321M Apr 18 08:43 eg/ERR188273_chrX.sam
+    ## -rw-r--r-- 1 root root 321M Apr 18 12:20 eg/ERR188273_chrX.sam
 
 Size of BAM file.
 
@@ -222,7 +222,7 @@ Size of BAM file.
 ls -lh eg/ERR188273_chrX.bam
 ```
 
-    ## -rw-r--r-- 1 root root 67M Apr 18 08:41 eg/ERR188273_chrX.bam
+    ## -rw-r--r-- 1 root root 67M Apr 18 12:18 eg/ERR188273_chrX.bam
 
 We can use `head` to view a SAM file.
 
@@ -272,9 +272,9 @@ samtools view -T genome/chrX.fa -C -o eg/ERR188273_chrX.cram eg/ERR188273_chrX.b
 ls -lh eg/ERR188273_chrX.[sbcr]*am
 ```
 
-    ## -rw-r--r-- 1 root root  67M Apr 18 08:41 eg/ERR188273_chrX.bam
-    ## -rw-r--r-- 1 root root  40M Apr 18 08:43 eg/ERR188273_chrX.cram
-    ## -rw-r--r-- 1 root root 321M Apr 18 08:43 eg/ERR188273_chrX.sam
+    ## -rw-r--r-- 1 root root  67M Apr 18 12:18 eg/ERR188273_chrX.bam
+    ## -rw-r--r-- 1 root root  40M Apr 18 12:20 eg/ERR188273_chrX.cram
+    ## -rw-r--r-- 1 root root 321M Apr 18 12:20 eg/ERR188273_chrX.sam
 
 You can use `samtools view` to view a CRAM file just as you would for a
 BAM file.
@@ -311,8 +311,8 @@ ls -l eg/ERR188273_chrX.bam
 ls -l eg/sorted.bam
 ```
 
-    ## -rw-r--r-- 1 root root 69983526 Apr 18 08:41 eg/ERR188273_chrX.bam
-    ## -rw-r--r-- 1 root root 69983598 Apr 18 08:44 eg/sorted.bam
+    ## -rw-r--r-- 1 root root 69983526 Apr 18 12:18 eg/ERR188273_chrX.bam
+    ## -rw-r--r-- 1 root root 69983598 Apr 18 12:21 eg/sorted.bam
 
 You should use use additional threads (if they are available) to speed
 up sorting; to use four threads, use `-@ 4`.
@@ -324,9 +324,9 @@ time samtools sort eg/ERR188273_chrX.sam -o eg/sorted.bam
 ```
 
     ## 
-    ## real 0m11.111s
-    ## user 0m10.795s
-    ## sys  0m0.264s
+    ## real 0m10.599s
+    ## user 0m10.220s
+    ## sys  0m0.260s
 
 Time taken using four threads.
 
@@ -336,9 +336,9 @@ time samtools sort -@ 4 eg/ERR188273_chrX.sam -o eg/sorted.bam
 
     ## [bam_sort_core] merging from 0 files and 4 in-memory blocks...
     ## 
-    ## real 0m5.797s
-    ## user 0m10.966s
-    ## sys  0m0.213s
+    ## real 0m5.870s
+    ## user 0m10.710s
+    ## sys  0m0.383s
 
 Many of the SAMtools subtools can use additional threads, so make use of
 them if you have the resources\!
@@ -452,29 +452,6 @@ samtools flags 73
 
     ## 0x49 73  PAIRED,MUNMAP,READ1
 
-## Filtering unmapped reads
-
-Use `-F 4` to filter out unmapped reads.
-
-``` bash
-samtools view -F 4 -b eg/ERR188273_chrX.bam > eg/ERR188273_chrX.mapped.bam
-```
-
-Use `-f 4` to keep only unmapped reads.
-
-``` bash
-samtools view -f 4 -b eg/ERR188273_chrX.bam > eg/ERR188273_chrX.unmapped.bam
-```
-
-We can use the `flags` subcommand to confirm that a value of four
-represents an unmapped read.
-
-``` bash
-samtools flags 4
-```
-
-    ## 0x4  4   UNMAP
-
 ### Proper pair
 
 Reads that are properly paired are mapped within an expected distance
@@ -488,24 +465,8 @@ reads are not properly paired (set with `-d 0.1`).
 script/generate_random_seq.pl 30 10000 1984 > test_ref.fa
 script/random_paired_end.pl -f test_ref.fa -l 100 -n 10000 -m 300 -d 0.1
 bwa index test_ref.fa 2> /dev/null
-bwa mem test_ref.fa l100_n10000_d300_1984_1.fq.gz l100_n10000_d300_1984_2.fq.gz > aln.sam
+bwa mem test_ref.fa l100_n10000_d300_1984_1.fq.gz l100_n10000_d300_1984_2.fq.gz > aln.sam 2> /dev/null
 ```
-
-    ## [M::bwa_idx_load_from_disk] read 0 ALT contigs
-    ## [M::process] read 20000 sequences (2000000 bp)...
-    ## [M::mem_pestat] # candidate unique pairs for (FF, FR, RF, RR): (0, 9006, 0, 0)
-    ## [M::mem_pestat] skip orientation FF as there are not enough pairs
-    ## [M::mem_pestat] analyzing insert size distribution for orientation FR...
-    ## [M::mem_pestat] (25, 50, 75) percentile: (399, 399, 399)
-    ## [M::mem_pestat] low and high boundaries for computing mean and std.dev: (399, 399)
-    ## [M::mem_pestat] mean and std.dev: (399.00, 0.00)
-    ## [M::mem_pestat] low and high boundaries for proper pairs: (399, 399)
-    ## [M::mem_pestat] skip orientation RF as there are not enough pairs
-    ## [M::mem_pestat] skip orientation RR as there are not enough pairs
-    ## [M::mem_process_seqs] Processed 20000 reads in 0.485 CPU sec, 0.485 real sec
-    ## [main] Version: 0.7.17-r1188
-    ## [main] CMD: bwa mem test_ref.fa l100_n10000_d300_1984_1.fq.gz l100_n10000_d300_1984_2.fq.gz
-    ## [main] Real time: 0.529 sec; CPU: 0.524 sec
 
 `samtools flagstat` will indicate that some reads (about 10%) mapped to
 different chromosomes.
@@ -546,6 +507,29 @@ samtools flag $(samtools view -F 2 aln.sam | head -1 | cut -f2)
 ```
 
     ## 0x61 97  PAIRED,MREVERSE,READ1
+
+## Filtering unmapped reads
+
+Use `-F 4` to filter out unmapped reads.
+
+``` bash
+samtools view -F 4 -b eg/ERR188273_chrX.bam > eg/ERR188273_chrX.mapped.bam
+```
+
+Use `-f 4` to keep only unmapped reads.
+
+``` bash
+samtools view -f 4 -b eg/ERR188273_chrX.bam > eg/ERR188273_chrX.unmapped.bam
+```
+
+We can use the `flags` subcommand to confirm that a value of four
+represents an unmapped read.
+
+``` bash
+samtools flags 4
+```
+
+    ## 0x4  4   UNMAP
 
 ## Extracting entries mapping to a specific loci
 
