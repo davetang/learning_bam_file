@@ -1,6 +1,6 @@
 all: readme
 data: genome/chrX.fa
-tools: github-markdown-toc samtools pandoc
+tools: github-markdown-toc samtools pandoc bwa
 pandoc: /usr/bin/pandoc
 samtools_ver = 1.15
 
@@ -12,6 +12,9 @@ github-markdown-toc:
 
 samtools:
 	wget https://github.com/samtools/samtools/releases/download/$(samtools_ver)/samtools-$(samtools_ver).tar.bz2 && tar xjf samtools-$(samtools_ver).tar.bz2 && cd samtools-$(samtools_ver) && ./configure && make && mv samtools .. && cd .. && rm -rf samtools-$(samtools_ver).tar.bz2 samtools-$(samtools_ver)
+
+bwa:
+	wget https://github.com/lh3/bwa/releases/download/v0.7.17/bwa-0.7.17.tar.bz2 && tar xjf bwa-0.7.17.tar.bz2 && cd bwa-0.7.17 && make && mv bwa .. && cd .. && rm -rf bwa-*
 
 /usr/bin/pandoc:
 	apt update && apt install -y pandoc
