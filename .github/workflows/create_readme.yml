@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
 
     # the type of runner to run the given job
-    container: davetang/r_build:4.1.2
+    container: davetang/r_build:4.1.3
 
     # a list of the steps that will run as part of the job
     steps:
