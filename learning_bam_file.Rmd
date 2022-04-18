@@ -427,7 +427,7 @@ minimap2 -ax sr test_ref.fa l${len}_n${n}_d${m}_1984_1.fq.gz l${len}_n${n}_d${m}
 The BAM files can be used with `mpileup` to compare the depths.
 
 ```{bash engine.opts='-l'}
-samtools mpileup -s -f test_ref.fa aln_bwa.bam aln_mm.bam
+samtools mpileup -s -f test_ref.fa aln_bwa.bam aln_mm.bam | head -20
 ```
 
 Another approach is to use [deepTools](https://deeptools.readthedocs.io/en/develop/) and the [bamCompare](https://deeptools.readthedocs.io/en/develop/content/tools/bamCompare.html) command. The bigWig output file shows the ratio of reads between `b1` and `b2` in 50 bp (default) windows.
