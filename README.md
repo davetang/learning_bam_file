@@ -30,7 +30,7 @@ Table of Contents
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
 
-Mon 18 Apr 2022 08:37:28 AM UTC
+Mon 18 Apr 2022 08:45:56 AM UTC
 
 Learning the BAM format
 ================
@@ -214,7 +214,7 @@ Size of SAM file.
 ls -lh eg/ERR188273_chrX.sam
 ```
 
-    ## -rw-r--r-- 1 root root 321M Apr 18 08:35 eg/ERR188273_chrX.sam
+    ## -rw-r--r-- 1 root root 321M Apr 18 08:43 eg/ERR188273_chrX.sam
 
 Size of BAM file.
 
@@ -222,7 +222,7 @@ Size of BAM file.
 ls -lh eg/ERR188273_chrX.bam
 ```
 
-    ## -rw-r--r-- 1 root root 67M Apr 18 08:33 eg/ERR188273_chrX.bam
+    ## -rw-r--r-- 1 root root 67M Apr 18 08:41 eg/ERR188273_chrX.bam
 
 We can use `head` to view a SAM file.
 
@@ -272,9 +272,9 @@ samtools view -T genome/chrX.fa -C -o eg/ERR188273_chrX.cram eg/ERR188273_chrX.b
 ls -lh eg/ERR188273_chrX.[sbcr]*am
 ```
 
-    ## -rw-r--r-- 1 root root  67M Apr 18 08:33 eg/ERR188273_chrX.bam
-    ## -rw-r--r-- 1 root root  40M Apr 18 08:35 eg/ERR188273_chrX.cram
-    ## -rw-r--r-- 1 root root 321M Apr 18 08:35 eg/ERR188273_chrX.sam
+    ## -rw-r--r-- 1 root root  67M Apr 18 08:41 eg/ERR188273_chrX.bam
+    ## -rw-r--r-- 1 root root  40M Apr 18 08:43 eg/ERR188273_chrX.cram
+    ## -rw-r--r-- 1 root root 321M Apr 18 08:43 eg/ERR188273_chrX.sam
 
 You can use `samtools view` to view a CRAM file just as you would for a
 BAM file.
@@ -311,8 +311,8 @@ ls -l eg/ERR188273_chrX.bam
 ls -l eg/sorted.bam
 ```
 
-    ## -rw-r--r-- 1 root root 69983526 Apr 18 08:33 eg/ERR188273_chrX.bam
-    ## -rw-r--r-- 1 root root 69983598 Apr 18 08:35 eg/sorted.bam
+    ## -rw-r--r-- 1 root root 69983526 Apr 18 08:41 eg/ERR188273_chrX.bam
+    ## -rw-r--r-- 1 root root 69983598 Apr 18 08:44 eg/sorted.bam
 
 You should use use additional threads (if they are available) to speed
 up sorting; to use four threads, use `-@ 4`.
@@ -324,9 +324,9 @@ time samtools sort eg/ERR188273_chrX.sam -o eg/sorted.bam
 ```
 
     ## 
-    ## real 0m10.378s
-    ## user 0m10.031s
-    ## sys  0m0.276s
+    ## real 0m11.111s
+    ## user 0m10.795s
+    ## sys  0m0.264s
 
 Time taken using four threads.
 
@@ -336,9 +336,9 @@ time samtools sort -@ 4 eg/ERR188273_chrX.sam -o eg/sorted.bam
 
     ## [bam_sort_core] merging from 0 files and 4 in-memory blocks...
     ## 
-    ## real 0m5.493s
-    ## user 0m10.205s
-    ## sys  0m0.300s
+    ## real 0m5.797s
+    ## user 0m10.966s
+    ## sys  0m0.213s
 
 Many of the SAMtools subtools can use additional threads, so make use of
 them if you have the resources\!
@@ -487,19 +487,10 @@ reads are not properly paired (set with `-d 0.1`).
 ``` bash
 script/generate_random_seq.pl 30 10000 1984 > test_ref.fa
 script/random_paired_end.pl -f test_ref.fa -l 100 -n 10000 -m 300 -d 0.1
-bwa index test_ref.fa
+bwa index test_ref.fa 2> /dev/null
 bwa mem test_ref.fa l100_n10000_d300_1984_1.fq.gz l100_n10000_d300_1984_2.fq.gz > aln.sam
 ```
 
-    ## [bwa_index] Pack FASTA... 0.00 sec
-    ## [bwa_index] Construct BWT for the packed sequence...
-    ## [bwa_index] 0.06 seconds elapse.
-    ## [bwa_index] Update BWT... 0.00 sec
-    ## [bwa_index] Pack forward-only FASTA... 0.00 sec
-    ## [bwa_index] Construct SA from BWT and Occ... 0.03 sec
-    ## [main] Version: 0.7.17-r1188
-    ## [main] CMD: bwa index test_ref.fa
-    ## [main] Real time: 0.096 sec; CPU: 0.090 sec
     ## [M::bwa_idx_load_from_disk] read 0 ALT contigs
     ## [M::process] read 20000 sequences (2000000 bp)...
     ## [M::mem_pestat] # candidate unique pairs for (FF, FR, RF, RR): (0, 9006, 0, 0)
@@ -511,13 +502,13 @@ bwa mem test_ref.fa l100_n10000_d300_1984_1.fq.gz l100_n10000_d300_1984_2.fq.gz 
     ## [M::mem_pestat] low and high boundaries for proper pairs: (399, 399)
     ## [M::mem_pestat] skip orientation RF as there are not enough pairs
     ## [M::mem_pestat] skip orientation RR as there are not enough pairs
-    ## [M::mem_process_seqs] Processed 20000 reads in 0.440 CPU sec, 0.440 real sec
+    ## [M::mem_process_seqs] Processed 20000 reads in 0.485 CPU sec, 0.485 real sec
     ## [main] Version: 0.7.17-r1188
     ## [main] CMD: bwa mem test_ref.fa l100_n10000_d300_1984_1.fq.gz l100_n10000_d300_1984_2.fq.gz
-    ## [main] Real time: 0.486 sec; CPU: 0.480 sec
+    ## [main] Real time: 0.529 sec; CPU: 0.524 sec
 
-`samtools flagstat` will indicate that some reads mapped to different
-chromosomes.
+`samtools flagstat` will indicate that some reads (about 10%) mapped to
+different chromosomes.
 
 ``` bash
 samtools flagstat aln.sam
@@ -548,7 +539,7 @@ samtools flag $(samtools view -f 2 aln.sam | head -1 | cut -f2)
 
     ## 0x63 99  PAIRED,PROPER_PAIR,MREVERSE,READ1
 
-Flag of a pair (not is not a proper pair).
+Flag of a pair (that is not a proper pair).
 
 ``` bash
 samtools flag $(samtools view -F 2 aln.sam | head -1 | cut -f2)
