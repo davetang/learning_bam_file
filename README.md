@@ -14,6 +14,7 @@ Table of Contents
    * [Adding read groups](#adding-read-groups)
    * [Interpreting the BAM flags](#interpreting-the-bam-flags)
    * [Filtering unmapped reads](#filtering-unmapped-reads)
+      * [Proper pair](#proper-pair)
    * [Extracting entries mapping to a specific loci](#extracting-entries-mapping-to-a-specific-loci)
    * [Extracting only the first read from paired end BAM files](#extracting-only-the-first-read-from-paired-end-bam-files)
    * [Stats](#stats)
@@ -27,9 +28,9 @@ Table of Contents
    * [Coverage](#coverage)
    * [Stargazers over time](#stargazers-over-time)
 
-Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
+<!-- Created by https://github.com/ekalinin/github-markdown-toc -->
 
-Sun 13 Mar 2022 08:45:04 AM UTC
+Mon 18 Apr 2022 08:37:28 AM UTC
 
 Learning the BAM format
 ================
@@ -213,7 +214,7 @@ Size of SAM file.
 ls -lh eg/ERR188273_chrX.sam
 ```
 
-    ## -rw-r--r-- 1 root root 321M Mar 13 08:42 eg/ERR188273_chrX.sam
+    ## -rw-r--r-- 1 root root 321M Apr 18 08:35 eg/ERR188273_chrX.sam
 
 Size of BAM file.
 
@@ -221,7 +222,7 @@ Size of BAM file.
 ls -lh eg/ERR188273_chrX.bam
 ```
 
-    ## -rw-r--r-- 1 root root 67M Mar 13 08:40 eg/ERR188273_chrX.bam
+    ## -rw-r--r-- 1 root root 67M Apr 18 08:33 eg/ERR188273_chrX.bam
 
 We can use `head` to view a SAM file.
 
@@ -271,9 +272,9 @@ samtools view -T genome/chrX.fa -C -o eg/ERR188273_chrX.cram eg/ERR188273_chrX.b
 ls -lh eg/ERR188273_chrX.[sbcr]*am
 ```
 
-    ## -rw-r--r-- 1 root root  67M Mar 13 08:40 eg/ERR188273_chrX.bam
-    ## -rw-r--r-- 1 root root  40M Mar 13 08:42 eg/ERR188273_chrX.cram
-    ## -rw-r--r-- 1 root root 321M Mar 13 08:42 eg/ERR188273_chrX.sam
+    ## -rw-r--r-- 1 root root  67M Apr 18 08:33 eg/ERR188273_chrX.bam
+    ## -rw-r--r-- 1 root root  40M Apr 18 08:35 eg/ERR188273_chrX.cram
+    ## -rw-r--r-- 1 root root 321M Apr 18 08:35 eg/ERR188273_chrX.sam
 
 You can use `samtools view` to view a CRAM file just as you would for a
 BAM file.
@@ -310,8 +311,8 @@ ls -l eg/ERR188273_chrX.bam
 ls -l eg/sorted.bam
 ```
 
-    ## -rw-r--r-- 1 root root 69983526 Mar 13 08:40 eg/ERR188273_chrX.bam
-    ## -rw-r--r-- 1 root root 69983598 Mar 13 08:43 eg/sorted.bam
+    ## -rw-r--r-- 1 root root 69983526 Apr 18 08:33 eg/ERR188273_chrX.bam
+    ## -rw-r--r-- 1 root root 69983598 Apr 18 08:35 eg/sorted.bam
 
 You should use use additional threads (if they are available) to speed
 up sorting; to use four threads, use `-@ 4`.
@@ -323,9 +324,9 @@ time samtools sort eg/ERR188273_chrX.sam -o eg/sorted.bam
 ```
 
     ## 
-    ## real 0m12.245s
-    ## user 0m11.872s
-    ## sys  0m0.272s
+    ## real 0m10.378s
+    ## user 0m10.031s
+    ## sys  0m0.276s
 
 Time taken using four threads.
 
@@ -335,9 +336,9 @@ time samtools sort -@ 4 eg/ERR188273_chrX.sam -o eg/sorted.bam
 
     ## [bam_sort_core] merging from 0 files and 4 in-memory blocks...
     ## 
-    ## real 0m6.512s
-    ## user 0m12.148s
-    ## sys  0m0.350s
+    ## real 0m5.493s
+    ## user 0m10.205s
+    ## sys  0m0.300s
 
 Many of the SAMtools subtools can use additional threads, so make use of
 them if you have the resources\!
@@ -473,6 +474,87 @@ samtools flags 4
 ```
 
     ## 0x4  4   UNMAP
+
+### Proper pair
+
+Reads that are properly paired are mapped within an expected distance
+with each other and with one pair in the reverse complement orientation.
+The script `generate_random_seq.pl` can generate reads that originate
+from different references and are thus discordant and not properly
+paired (as well as properly paired reads). In the example below, 10% of
+reads are not properly paired (set with `-d 0.1`).
+
+``` bash
+script/generate_random_seq.pl 30 10000 1984 > test_ref.fa
+script/random_paired_end.pl -f test_ref.fa -l 100 -n 10000 -m 300 -d 0.1
+bwa index test_ref.fa
+bwa mem test_ref.fa l100_n10000_d300_1984_1.fq.gz l100_n10000_d300_1984_2.fq.gz > aln.sam
+```
+
+    ## [bwa_index] Pack FASTA... 0.00 sec
+    ## [bwa_index] Construct BWT for the packed sequence...
+    ## [bwa_index] 0.06 seconds elapse.
+    ## [bwa_index] Update BWT... 0.00 sec
+    ## [bwa_index] Pack forward-only FASTA... 0.00 sec
+    ## [bwa_index] Construct SA from BWT and Occ... 0.03 sec
+    ## [main] Version: 0.7.17-r1188
+    ## [main] CMD: bwa index test_ref.fa
+    ## [main] Real time: 0.096 sec; CPU: 0.090 sec
+    ## [M::bwa_idx_load_from_disk] read 0 ALT contigs
+    ## [M::process] read 20000 sequences (2000000 bp)...
+    ## [M::mem_pestat] # candidate unique pairs for (FF, FR, RF, RR): (0, 9006, 0, 0)
+    ## [M::mem_pestat] skip orientation FF as there are not enough pairs
+    ## [M::mem_pestat] analyzing insert size distribution for orientation FR...
+    ## [M::mem_pestat] (25, 50, 75) percentile: (399, 399, 399)
+    ## [M::mem_pestat] low and high boundaries for computing mean and std.dev: (399, 399)
+    ## [M::mem_pestat] mean and std.dev: (399.00, 0.00)
+    ## [M::mem_pestat] low and high boundaries for proper pairs: (399, 399)
+    ## [M::mem_pestat] skip orientation RF as there are not enough pairs
+    ## [M::mem_pestat] skip orientation RR as there are not enough pairs
+    ## [M::mem_process_seqs] Processed 20000 reads in 0.440 CPU sec, 0.440 real sec
+    ## [main] Version: 0.7.17-r1188
+    ## [main] CMD: bwa mem test_ref.fa l100_n10000_d300_1984_1.fq.gz l100_n10000_d300_1984_2.fq.gz
+    ## [main] Real time: 0.486 sec; CPU: 0.480 sec
+
+`samtools flagstat` will indicate that some reads mapped to different
+chromosomes.
+
+``` bash
+samtools flagstat aln.sam
+```
+
+    ## 20000 + 0 in total (QC-passed reads + QC-failed reads)
+    ## 20000 + 0 primary
+    ## 0 + 0 secondary
+    ## 0 + 0 supplementary
+    ## 0 + 0 duplicates
+    ## 0 + 0 primary duplicates
+    ## 20000 + 0 mapped (100.00% : N/A)
+    ## 20000 + 0 primary mapped (100.00% : N/A)
+    ## 20000 + 0 paired in sequencing
+    ## 10000 + 0 read1
+    ## 10000 + 0 read2
+    ## 18012 + 0 properly paired (90.06% : N/A)
+    ## 20000 + 0 with itself and mate mapped
+    ## 0 + 0 singletons (0.00% : N/A)
+    ## 1988 + 0 with mate mapped to a different chr
+    ## 1988 + 0 with mate mapped to a different chr (mapQ>=5)
+
+Flag of a proper pair.
+
+``` bash
+samtools flag $(samtools view -f 2 aln.sam | head -1 | cut -f2)
+```
+
+    ## 0x63 99  PAIRED,PROPER_PAIR,MREVERSE,READ1
+
+Flag of a pair (not is not a proper pair).
+
+``` bash
+samtools flag $(samtools view -F 2 aln.sam | head -1 | cut -f2)
+```
+
+    ## 0x61 97  PAIRED,MREVERSE,READ1
 
 ## Extracting entries mapping to a specific loci
 
