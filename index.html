@@ -1,53 +1,47 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="None">
-  
-  
-  <link rel="shortcut icon" href="img/favicon.ico">
-  <title>Learning the BAM format</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
-
-  <link rel="stylesheet" href="css/theme.css" />
-  <link rel="stylesheet" href="css/theme_extra.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
-  
-  <script>
-    // Current page data
-    var mkdocs_page_name = "Home";
-    var mkdocs_page_input_path = "index.md";
-    var mkdocs_page_url = null;
-  </script>
-  
-  <script src="js/jquery-2.1.1.min.js" defer></script>
-  <script src="js/modernizr-2.8.3.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
-  <script>hljs.initHighlightingOnLoad();</script> 
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="description" content="None" />
+      <link rel="shortcut icon" href="img/favicon.ico" />
+    <title>Learning the BAM format</title>
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Home";
+        var mkdocs_page_input_path = "index.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
     <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href="." class="icon icon-home"> Learning the BAM format</a>
-        <div role="search">
+          <a href="." class="icon icon-home"> Learning the BAM format
+        </a><div role="search">
   <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
       <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
   </form>
 </div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-                <ul class="current">
-                    <li class="toctree-l1 current"><a class="reference internal current" href=".">Home</a>
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href=".">Home</a>
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a>
     </li>
@@ -100,40 +94,30 @@
     <li class="toctree-l2"><a class="reference internal" href="#stargazers-over-time">Stargazers over time</a>
     </li>
     </ul>
-                    </li>
-                </ul>
+                </li>
+              </ul>
       </div>
     </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href=".">Learning the BAM format</a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href=".">Learning the BAM format</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href=".">Docs</a> &raquo;</li>
-    
-      
-    
-    <li>Home</li>
+    <li><a href="." class="icon icon-home" alt="Docs"></a> &raquo;</li><li>Home</li>
     <li class="wy-breadcrumbs-aside">
-      
     </li>
   </ul>
-  
   <hr/>
 </div>
 
-          <div role="main">
-            <div class="section">
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
               
                 <h1 id="learning-the-bam-format">Learning the BAM format</h1>
 <h2 id="introduction">Introduction</h2>
@@ -283,12 +267,12 @@ and are faster to process.</p>
 <p>Size of SAM file.</p>
 <pre><code class="language-bash">ls -lh eg/ERR188273_chrX.sam
 </code></pre>
-<pre><code>## -rw-r--r-- 1 root root 321M Apr 18 12:20 eg/ERR188273_chrX.sam
+<pre><code>## -rw-r--r-- 1 root root 321M Apr 18 13:49 eg/ERR188273_chrX.sam
 </code></pre>
 <p>Size of BAM file.</p>
 <pre><code class="language-bash">ls -lh eg/ERR188273_chrX.bam
 </code></pre>
-<pre><code>## -rw-r--r-- 1 root root 67M Apr 18 12:18 eg/ERR188273_chrX.bam
+<pre><code>## -rw-r--r-- 1 root root 67M Apr 18 13:47 eg/ERR188273_chrX.bam
 </code></pre>
 <p>We can use <code>head</code> to view a SAM file.</p>
 <pre><code class="language-bash">head eg/ERR188273_chrX.sam
@@ -325,9 +309,9 @@ and <code>-C</code> arguments to convert a BAM file into CRAM.</p>
 
 ls -lh eg/ERR188273_chrX.[sbcr]*am
 </code></pre>
-<pre><code>## -rw-r--r-- 1 root root  67M Apr 18 12:18 eg/ERR188273_chrX.bam
-## -rw-r--r-- 1 root root  40M Apr 18 12:20 eg/ERR188273_chrX.cram
-## -rw-r--r-- 1 root root 321M Apr 18 12:20 eg/ERR188273_chrX.sam
+<pre><code>## -rw-r--r-- 1 root root  67M Apr 18 13:47 eg/ERR188273_chrX.bam
+## -rw-r--r-- 1 root root  40M Apr 18 13:49 eg/ERR188273_chrX.cram
+## -rw-r--r-- 1 root root 321M Apr 18 13:49 eg/ERR188273_chrX.sam
 </code></pre>
 <p>You can use <code>samtools view</code> to view a CRAM file just as you would for a
 BAM file.</p>
@@ -356,8 +340,8 @@ sorted BAM file from a SAM file.</p>
 ls -l eg/ERR188273_chrX.bam
 ls -l eg/sorted.bam
 </code></pre>
-<pre><code>## -rw-r--r-- 1 root root 69983526 Apr 18 12:18 eg/ERR188273_chrX.bam
-## -rw-r--r-- 1 root root 69983598 Apr 18 12:21 eg/sorted.bam
+<pre><code>## -rw-r--r-- 1 root root 69983526 Apr 18 13:47 eg/ERR188273_chrX.bam
+## -rw-r--r-- 1 root root 69983598 Apr 18 13:49 eg/sorted.bam
 </code></pre>
 <p>You should use use additional threads (if they are available) to speed
 up sorting; to use four threads, use <code>-@ 4</code>.</p>
@@ -365,18 +349,18 @@ up sorting; to use four threads, use <code>-@ 4</code>.</p>
 <pre><code class="language-bash">time samtools sort eg/ERR188273_chrX.sam -o eg/sorted.bam
 </code></pre>
 <pre><code>## 
-## real 0m10.599s
-## user 0m10.220s
-## sys  0m0.260s
+## real 0m9.192s
+## user 0m8.878s
+## sys  0m0.236s
 </code></pre>
 <p>Time taken using four threads.</p>
 <pre><code class="language-bash">time samtools sort -@ 4 eg/ERR188273_chrX.sam -o eg/sorted.bam
 </code></pre>
 <pre><code>## [bam_sort_core] merging from 0 files and 4 in-memory blocks...
 ## 
-## real 0m5.870s
-## user 0m10.710s
-## sys  0m0.383s
+## real 0m5.257s
+## user 0m9.655s
+## sys  0m0.302s
 </code></pre>
 <p>Many of the SAMtools subtools can use additional threads, so make use of
 them if you have the resources!</p>
@@ -733,11 +717,48 @@ reads.</p>
 ## aaaaaaaaaaaaaagaTggggtctctctatgttggccaggt
 </code></pre>
 <h2 id="comparing-bam-files">Comparing BAM files</h2>
-<p>Install <a href="https://deeptools.readthedocs.io/en/develop/">deepTools</a> and
-use
-<a href="https://deeptools.readthedocs.io/en/develop/content/tools/bamCompare.html">bamCompare</a>.
-The bigWig output file shows the ratio of reads between <code>b1</code> and <code>b2</code> in
-50 bp (default) windows.</p>
+<p>The output from <code>mpileup</code> can be used to compare BAM files. The commands
+below generates alignments using <code>bwa</code> and <code>minimap2</code>.</p>
+<pre><code class="language-bash">len=100
+n=10000
+m=300
+script/generate_random_seq.pl 30 1000000 1984 &gt; test_ref.fa
+script/random_paired_end.pl -f test_ref.fa -l ${len} -n ${n} -m ${m}
+bwa index test_ref.fa 2&gt; /dev/null
+
+bwa mem test_ref.fa l${len}_n${n}_d${m}_1984_1.fq.gz l${len}_n${n}_d${m}_1984_2.fq.gz 2&gt; /dev/null | samtools sort - -o aln_bwa.bam
+minimap2 -ax sr test_ref.fa l${len}_n${n}_d${m}_1984_1.fq.gz l${len}_n${n}_d${m}_1984_2.fq.gz 2&gt; /dev/null | samtools sort - -o aln_mm.bam
+</code></pre>
+<p>The BAM files can be used with <code>mpileup</code> to compare the depths.</p>
+<pre><code class="language-bash">samtools mpileup -s -f test_ref.fa aln_bwa.bam aln_mm.bam | head -20
+</code></pre>
+<pre><code>## [mpileup] 2 samples in 2 input files
+## 1    7741    T   1   ^]. E   ]   1   ^]. E   ]
+## 1    7742    G   1   .   J   ]   1   .   J   ]
+## 1    7743    C   1   .   J   ]   1   .   J   ]
+## 1    7744    A   1   .   J   ]   1   .   J   ]
+## 1    7745    G   1   .   J   ]   1   .   J   ]
+## 1    7746    C   1   .   J   ]   1   .   J   ]
+## 1    7747    A   1   .   J   ]   1   .   J   ]
+## 1    7748    G   1   .   J   ]   1   .   J   ]
+## 1    7749    G   1   .   J   ]   1   .   J   ]
+## 1    7750    T   1   .   J   ]   1   .   J   ]
+## 1    7751    C   1   .   J   ]   1   .   J   ]
+## 1    7752    C   1   .   J   ]   1   .   J   ]
+## 1    7753    C   1   .   J   ]   1   .   J   ]
+## 1    7754    C   1   .   J   ]   1   .   J   ]
+## 1    7755    G   1   .   J   ]   1   .   J   ]
+## 1    7756    A   1   .   J   ]   1   .   J   ]
+## 1    7757    C   1   .   J   ]   1   .   J   ]
+## 1    7758    C   1   .   J   ]   1   .   J   ]
+## 1    7759    A   1   .   J   ]   1   .   J   ]
+## 1    7760    A   1   .   J   ]   1   .   J   ]
+</code></pre>
+<p>Another approach is to use
+<a href="https://deeptools.readthedocs.io/en/develop/">deepTools</a> and the
+<a href="https://deeptools.readthedocs.io/en/develop/content/tools/bamCompare.html">bamCompare</a>
+command. The bigWig output file shows the ratio of reads between <code>b1</code>
+and <code>b2</code> in 50 bp (default) windows.</p>
 <h2 id="converting-reference-names">Converting reference names</h2>
 <p>One of the most annoying bioinformatics problems is the use of different
 chromosome names, e.g. chr1 vs 1, in different references even when the
@@ -870,20 +891,17 @@ post</a> on using
 time" src="https://starchart.cc/davetang/learning_bam_file.svg" /></a></p>
               
             </div>
-          </div>
-          <footer>
-  
+          </div><footer>
 
   <hr/>
 
   <div role="contentinfo">
     <!-- Copyright etc -->
-    
   </div>
 
-  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-      
+          
         </div>
       </div>
 
@@ -891,7 +909,7 @@ time" src="https://starchart.cc/davetang/learning_bam_file.svg" /></a></p>
 
   </div>
 
-  <div class="rst-versions" role="note" aria-label="versions">
+  <div class="rst-versions" role="note" aria-label="Versions">
   <span class="rst-current-version" data-toggle="rst-current-version">
     
     
@@ -912,6 +930,6 @@ time" src="https://starchart.cc/davetang/learning_bam_file.svg" /></a></p>
 </html>
 
 <!--
-MkDocs version : 1.2.3
-Build Date UTC : 2022-04-18 12:22:51.195494+00:00
+MkDocs version : 1.3.0
+Build Date UTC : 2022-04-18 13:51:57.813616+00:00
 -->
