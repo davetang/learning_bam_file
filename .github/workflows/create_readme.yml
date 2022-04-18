@@ -36,6 +36,7 @@ jobs:
         run: |
           git config --global user.name 'Dave Tang'
           git config --global user.email 'davetingpongtang@gmail.com'
+          git config --global --add safe.directory /__w/learning_bam_file/learning_bam_file
           git add "README.md"
           git commit -m "Build README.md"
           git push origin main
