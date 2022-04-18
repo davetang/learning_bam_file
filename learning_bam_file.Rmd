@@ -410,7 +410,27 @@ samtools faidx genome/chrX.fa chrX:300000-300100
 
 ## Comparing BAM files
 
-Install [deepTools](https://deeptools.readthedocs.io/en/develop/) and use [bamCompare](https://deeptools.readthedocs.io/en/develop/content/tools/bamCompare.html). The bigWig output file shows the ratio of reads between `b1` and `b2` in 50 bp (default) windows.
+The output from `mpileup` can be used to compare BAM files. The commands below generates alignments using `bwa` and `minimap2`.
+
+```{bash engine.opts='-l'}
+len=100
+n=10000
+m=300
+script/generate_random_seq.pl 30 1000000 1984 > test_ref.fa
+script/random_paired_end.pl -f test_ref.fa -l ${len} -n ${n} -m ${m}
+bwa index test_ref.fa 2> /dev/null
+
+bwa mem test_ref.fa l${len}_n${n}_d${m}_1984_1.fq.gz l${len}_n${n}_d${m}_1984_2.fq.gz 2> /dev/null | samtools sort - -o aln_bwa.bam
+minimap2 -ax sr test_ref.fa l${len}_n${n}_d${m}_1984_1.fq.gz l${len}_n${n}_d${m}_1984_2.fq.gz 2> /dev/null | samtools sort - -o aln_mm.bam
+```
+
+The BAM files can be used with `mpileup` to compare the depths.
+
+```{bash engine.opts='-l'}
+samtools mpileup -s -f test_ref.fa aln_bwa.bam aln_mm.bam
+```
+
+Another approach is to use [deepTools](https://deeptools.readthedocs.io/en/develop/) and the [bamCompare](https://deeptools.readthedocs.io/en/develop/content/tools/bamCompare.html) command. The bigWig output file shows the ratio of reads between `b1` and `b2` in 50 bp (default) windows.
 
 ## Converting reference names
 
