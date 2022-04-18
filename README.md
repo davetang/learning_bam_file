@@ -30,7 +30,7 @@ Table of Contents
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
 
-Mon 18 Apr 2022 12:22:48 PM UTC
+Mon 18 Apr 2022 01:51:54 PM UTC
 
 Learning the BAM format
 ================
@@ -214,7 +214,7 @@ Size of SAM file.
 ls -lh eg/ERR188273_chrX.sam
 ```
 
-    ## -rw-r--r-- 1 root root 321M Apr 18 12:20 eg/ERR188273_chrX.sam
+    ## -rw-r--r-- 1 root root 321M Apr 18 13:49 eg/ERR188273_chrX.sam
 
 Size of BAM file.
 
@@ -222,7 +222,7 @@ Size of BAM file.
 ls -lh eg/ERR188273_chrX.bam
 ```
 
-    ## -rw-r--r-- 1 root root 67M Apr 18 12:18 eg/ERR188273_chrX.bam
+    ## -rw-r--r-- 1 root root 67M Apr 18 13:47 eg/ERR188273_chrX.bam
 
 We can use `head` to view a SAM file.
 
@@ -272,9 +272,9 @@ samtools view -T genome/chrX.fa -C -o eg/ERR188273_chrX.cram eg/ERR188273_chrX.b
 ls -lh eg/ERR188273_chrX.[sbcr]*am
 ```
 
-    ## -rw-r--r-- 1 root root  67M Apr 18 12:18 eg/ERR188273_chrX.bam
-    ## -rw-r--r-- 1 root root  40M Apr 18 12:20 eg/ERR188273_chrX.cram
-    ## -rw-r--r-- 1 root root 321M Apr 18 12:20 eg/ERR188273_chrX.sam
+    ## -rw-r--r-- 1 root root  67M Apr 18 13:47 eg/ERR188273_chrX.bam
+    ## -rw-r--r-- 1 root root  40M Apr 18 13:49 eg/ERR188273_chrX.cram
+    ## -rw-r--r-- 1 root root 321M Apr 18 13:49 eg/ERR188273_chrX.sam
 
 You can use `samtools view` to view a CRAM file just as you would for a
 BAM file.
@@ -311,8 +311,8 @@ ls -l eg/ERR188273_chrX.bam
 ls -l eg/sorted.bam
 ```
 
-    ## -rw-r--r-- 1 root root 69983526 Apr 18 12:18 eg/ERR188273_chrX.bam
-    ## -rw-r--r-- 1 root root 69983598 Apr 18 12:21 eg/sorted.bam
+    ## -rw-r--r-- 1 root root 69983526 Apr 18 13:47 eg/ERR188273_chrX.bam
+    ## -rw-r--r-- 1 root root 69983598 Apr 18 13:49 eg/sorted.bam
 
 You should use use additional threads (if they are available) to speed
 up sorting; to use four threads, use `-@ 4`.
@@ -324,9 +324,9 @@ time samtools sort eg/ERR188273_chrX.sam -o eg/sorted.bam
 ```
 
     ## 
-    ## real 0m10.599s
-    ## user 0m10.220s
-    ## sys  0m0.260s
+    ## real 0m9.192s
+    ## user 0m8.878s
+    ## sys  0m0.236s
 
 Time taken using four threads.
 
@@ -336,9 +336,9 @@ time samtools sort -@ 4 eg/ERR188273_chrX.sam -o eg/sorted.bam
 
     ## [bam_sort_core] merging from 0 files and 4 in-memory blocks...
     ## 
-    ## real 0m5.870s
-    ## user 0m10.710s
-    ## sys  0m0.383s
+    ## real 0m5.257s
+    ## user 0m9.655s
+    ## sys  0m0.302s
 
 Many of the SAMtools subtools can use additional threads, so make use of
 them if you have the resources\!
@@ -796,11 +796,54 @@ samtools faidx genome/chrX.fa chrX:300000-300100
 
 ## Comparing BAM files
 
-Install [deepTools](https://deeptools.readthedocs.io/en/develop/) and
-use
-[bamCompare](https://deeptools.readthedocs.io/en/develop/content/tools/bamCompare.html).
-The bigWig output file shows the ratio of reads between `b1` and `b2` in
-50 bp (default) windows.
+The output from `mpileup` can be used to compare BAM files. The commands
+below generates alignments using `bwa` and `minimap2`.
+
+``` bash
+len=100
+n=10000
+m=300
+script/generate_random_seq.pl 30 1000000 1984 > test_ref.fa
+script/random_paired_end.pl -f test_ref.fa -l ${len} -n ${n} -m ${m}
+bwa index test_ref.fa 2> /dev/null
+
+bwa mem test_ref.fa l${len}_n${n}_d${m}_1984_1.fq.gz l${len}_n${n}_d${m}_1984_2.fq.gz 2> /dev/null | samtools sort - -o aln_bwa.bam
+minimap2 -ax sr test_ref.fa l${len}_n${n}_d${m}_1984_1.fq.gz l${len}_n${n}_d${m}_1984_2.fq.gz 2> /dev/null | samtools sort - -o aln_mm.bam
+```
+
+The BAM files can be used with `mpileup` to compare the depths.
+
+``` bash
+samtools mpileup -s -f test_ref.fa aln_bwa.bam aln_mm.bam | head -20
+```
+
+    ## [mpileup] 2 samples in 2 input files
+    ## 1    7741    T   1   ^]. E   ]   1   ^]. E   ]
+    ## 1    7742    G   1   .   J   ]   1   .   J   ]
+    ## 1    7743    C   1   .   J   ]   1   .   J   ]
+    ## 1    7744    A   1   .   J   ]   1   .   J   ]
+    ## 1    7745    G   1   .   J   ]   1   .   J   ]
+    ## 1    7746    C   1   .   J   ]   1   .   J   ]
+    ## 1    7747    A   1   .   J   ]   1   .   J   ]
+    ## 1    7748    G   1   .   J   ]   1   .   J   ]
+    ## 1    7749    G   1   .   J   ]   1   .   J   ]
+    ## 1    7750    T   1   .   J   ]   1   .   J   ]
+    ## 1    7751    C   1   .   J   ]   1   .   J   ]
+    ## 1    7752    C   1   .   J   ]   1   .   J   ]
+    ## 1    7753    C   1   .   J   ]   1   .   J   ]
+    ## 1    7754    C   1   .   J   ]   1   .   J   ]
+    ## 1    7755    G   1   .   J   ]   1   .   J   ]
+    ## 1    7756    A   1   .   J   ]   1   .   J   ]
+    ## 1    7757    C   1   .   J   ]   1   .   J   ]
+    ## 1    7758    C   1   .   J   ]   1   .   J   ]
+    ## 1    7759    A   1   .   J   ]   1   .   J   ]
+    ## 1    7760    A   1   .   J   ]   1   .   J   ]
+
+Another approach is to use
+[deepTools](https://deeptools.readthedocs.io/en/develop/) and the
+[bamCompare](https://deeptools.readthedocs.io/en/develop/content/tools/bamCompare.html)
+command. The bigWig output file shows the ratio of reads between `b1`
+and `b2` in 50 bp (default) windows.
 
 ## Converting reference names
 
