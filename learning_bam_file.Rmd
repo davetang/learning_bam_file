@@ -232,26 +232,6 @@ Find out about a `73` flag.
 samtools flags 73
 ```
 
-## Filtering unmapped reads
-
-Use `-F 4` to filter out unmapped reads.
-
-```{bash engine.opts='-l'}
-samtools view -F 4 -b eg/ERR188273_chrX.bam > eg/ERR188273_chrX.mapped.bam
-```
-
-Use `-f 4` to keep only unmapped reads.
-
-```{bash engine.opts='-l'}
-samtools view -f 4 -b eg/ERR188273_chrX.bam > eg/ERR188273_chrX.unmapped.bam
-```
-
-We can use the `flags` subcommand to confirm that a value of four represents an unmapped read.
-
-```{bash engine.opts='-l'}
-samtools flags 4
-```
-
 ### Proper pair
 
 Reads that are properly paired are mapped within an expected distance with each other and with one pair in the reverse complement orientation. The script `generate_random_seq.pl` can generate reads that originate from different references and are thus discordant and not properly paired (as well as properly paired reads). In the example below, 10% of reads are not properly paired (set with `-d 0.1`).
@@ -260,7 +240,7 @@ Reads that are properly paired are mapped within an expected distance with each 
 script/generate_random_seq.pl 30 10000 1984 > test_ref.fa
 script/random_paired_end.pl -f test_ref.fa -l 100 -n 10000 -m 300 -d 0.1
 bwa index test_ref.fa 2> /dev/null
-bwa mem test_ref.fa l100_n10000_d300_1984_1.fq.gz l100_n10000_d300_1984_2.fq.gz > aln.sam
+bwa mem test_ref.fa l100_n10000_d300_1984_1.fq.gz l100_n10000_d300_1984_2.fq.gz > aln.sam 2> /dev/null
 ```
 
 `samtools flagstat` will indicate that some reads (about 10%) mapped to different chromosomes.
@@ -279,6 +259,27 @@ Flag of a pair (that is not a proper pair).
 
 ```{bash engine.opts='-l'}
 samtools flag $(samtools view -F 2 aln.sam | head -1 | cut -f2)
+```
+
+
+## Filtering unmapped reads
+
+Use `-F 4` to filter out unmapped reads.
+
+```{bash engine.opts='-l'}
+samtools view -F 4 -b eg/ERR188273_chrX.bam > eg/ERR188273_chrX.mapped.bam
+```
+
+Use `-f 4` to keep only unmapped reads.
+
+```{bash engine.opts='-l'}
+samtools view -f 4 -b eg/ERR188273_chrX.bam > eg/ERR188273_chrX.unmapped.bam
+```
+
+We can use the `flags` subcommand to confirm that a value of four represents an unmapped read.
+
+```{bash engine.opts='-l'}
+samtools flags 4
 ```
 
 ## Extracting entries mapping to a specific loci
