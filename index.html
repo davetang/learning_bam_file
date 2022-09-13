@@ -268,12 +268,12 @@ and are faster to process.</p>
 <p>Size of SAM file.</p>
 <pre><code class="language-bash">ls -lh eg/ERR188273_chrX.sam
 </code></pre>
-<pre><code>## -rw-r--r-- 1 root root 321M Aug 18 23:46 eg/ERR188273_chrX.sam
+<pre><code>## -rw-r--r-- 1 root root 321M Sep 13 05:03 eg/ERR188273_chrX.sam
 </code></pre>
 <p>Size of BAM file.</p>
 <pre><code class="language-bash">ls -lh eg/ERR188273_chrX.bam
 </code></pre>
-<pre><code>## -rw-r--r-- 1 root root 67M Aug 18 23:44 eg/ERR188273_chrX.bam
+<pre><code>## -rw-r--r-- 1 root root 67M Sep 13 05:02 eg/ERR188273_chrX.bam
 </code></pre>
 <p>We can use <code>head</code> to view a SAM file.</p>
 <pre><code class="language-bash">head eg/ERR188273_chrX.sam
@@ -310,9 +310,9 @@ and <code>-C</code> arguments to convert a BAM file into CRAM.</p>
 
 ls -lh eg/ERR188273_chrX.[sbcr]*am
 </code></pre>
-<pre><code>## -rw-r--r-- 1 root root  67M Aug 18 23:44 eg/ERR188273_chrX.bam
-## -rw-r--r-- 1 root root  40M Aug 18 23:46 eg/ERR188273_chrX.cram
-## -rw-r--r-- 1 root root 321M Aug 18 23:46 eg/ERR188273_chrX.sam
+<pre><code>## -rw-r--r-- 1 root root  67M Sep 13 05:02 eg/ERR188273_chrX.bam
+## -rw-r--r-- 1 root root  40M Sep 13 05:04 eg/ERR188273_chrX.cram
+## -rw-r--r-- 1 root root 321M Sep 13 05:03 eg/ERR188273_chrX.sam
 </code></pre>
 <p>You can use <code>samtools view</code> to view a CRAM file just as you would for a
 BAM file.</p>
@@ -341,8 +341,8 @@ sorted BAM file from a SAM file.</p>
 ls -l eg/ERR188273_chrX.bam
 ls -l eg/sorted.bam
 </code></pre>
-<pre><code>## -rw-r--r-- 1 root root 69983526 Aug 18 23:44 eg/ERR188273_chrX.bam
-## -rw-r--r-- 1 root root 69983598 Aug 18 23:46 eg/sorted.bam
+<pre><code>## -rw-r--r-- 1 root root 69983526 Sep 13 05:02 eg/ERR188273_chrX.bam
+## -rw-r--r-- 1 root root 69983598 Sep 13 05:04 eg/sorted.bam
 </code></pre>
 <p>You should use use additional threads (if they are available) to speed
 up sorting; to use four threads, use <code>-@ 4</code>.</p>
@@ -350,18 +350,18 @@ up sorting; to use four threads, use <code>-@ 4</code>.</p>
 <pre><code class="language-bash">time samtools sort eg/ERR188273_chrX.sam -o eg/sorted.bam
 </code></pre>
 <pre><code>## 
-## real 0m10.403s
-## user 0m10.045s
-## sys  0m0.268s
+## real 0m10.557s
+## user 0m10.217s
+## sys  0m0.240s
 </code></pre>
 <p>Time taken using four threads.</p>
 <pre><code class="language-bash">time samtools sort -@ 4 eg/ERR188273_chrX.sam -o eg/sorted.bam
 </code></pre>
 <pre><code>## [bam_sort_core] merging from 0 files and 4 in-memory blocks...
 ## 
-## real 0m6.061s
-## user 0m11.180s
-## sys  0m0.378s
+## real 0m5.292s
+## user 0m9.641s
+## sys  0m0.325s
 </code></pre>
 <p>Many of the SAMtools subtools can use additional threads, so make use of
 them if you have the resources!</p>
@@ -734,26 +734,26 @@ minimap2 -ax sr test_ref.fa l${len}_n${n}_d${m}_1984_1.fq.gz l${len}_n${n}_d${m}
 <pre><code class="language-bash">samtools mpileup -s -f test_ref.fa aln_bwa.bam aln_mm.bam | head -20
 </code></pre>
 <pre><code>## [mpileup] 2 samples in 2 input files
-## 1    2466    C   1   ^]. B   ]   1   ^]. B   ]
-## 1    2467    C   1   .   E   ]   1   .   E   ]
-## 1    2468    T   1   .   J   ]   1   .   J   ]
-## 1    2469    G   1   .   J   ]   1   .   J   ]
-## 1    2470    A   1   .   J   ]   1   .   J   ]
-## 1    2471    C   1   .   J   ]   1   .   J   ]
-## 1    2472    T   1   .   J   ]   1   .   J   ]
-## 1    2473    G   1   .   J   ]   1   .   J   ]
-## 1    2474    T   1   .   J   ]   1   .   J   ]
-## 1    2475    T   1   .   J   ]   1   .   J   ]
-## 1    2476    G   1   .   J   ]   1   .   J   ]
-## 1    2477    G   1   .   J   ]   1   .   J   ]
-## 1    2478    G   1   .   J   ]   1   .   J   ]
-## 1    2479    A   1   .   J   ]   1   .   J   ]
-## 1    2480    C   1   .   J   ]   1   .   J   ]
-## 1    2481    G   1   .   J   ]   1   .   J   ]
-## 1    2482    A   1   .   J   ]   1   .   J   ]
-## 1    2483    A   1   .   J   ]   1   .   J   ]
-## 1    2484    A   1   .   J   ]   1   .   J   ]
-## 1    2485    A   1   .   J   ]   1   .   J   ]
+## 1    1694    C   1   ^]. D   ]   1   ^]. D   ]
+## 1    1695    G   1   .   I   ]   1   .   I   ]
+## 1    1696    T   1   .   J   ]   1   .   J   ]
+## 1    1697    T   1   .   J   ]   1   .   J   ]
+## 1    1698    A   1   .   J   ]   1   .   J   ]
+## 1    1699    A   1   .   J   ]   1   .   J   ]
+## 1    1700    T   1   .   J   ]   1   .   J   ]
+## 1    1701    C   1   .   J   ]   1   .   J   ]
+## 1    1702    A   1   .   J   ]   1   .   J   ]
+## 1    1703    A   1   .   J   ]   1   .   J   ]
+## 1    1704    T   1   .   J   ]   1   .   J   ]
+## 1    1705    C   1   .   J   ]   1   .   J   ]
+## 1    1706    C   1   .   J   ]   1   .   J   ]
+## 1    1707    C   1   .   J   ]   1   .   J   ]
+## 1    1708    C   1   .   J   ]   1   .   J   ]
+## 1    1709    C   1   .   J   ]   1   .   J   ]
+## 1    1710    A   1   .   J   ]   1   .   J   ]
+## 1    1711    A   1   .   J   ]   1   .   J   ]
+## 1    1712    C   1   .   J   ]   1   .   J   ]
+## 1    1713    A   1   .   J   ]   1   .   J   ]
 </code></pre>
 <p>Another approach is to use
 <a href="https://deeptools.readthedocs.io/en/develop/">deepTools</a> and the
@@ -796,9 +796,17 @@ samtools view eg/ERR188273_X.bam | head -2
 ## ERR188273.4711308    133 X   21649   0   *   =   21649   0   CTACAGGTGCCCGCCACCATGCCCAGCTAATTTTTTTTGTATTTTTAGTAGAGATGGGGTTTCACTGTGTTGGCC CB@FDFFFHHGFHIJJJJIIIIIIIGGGIJGIIJJJJJJFFHIIIIGECHEHHGGHHFF?AACCDDDDDDDDBCD YT:Z:UP
 </code></pre>
 <h2 id="coverage">Coverage</h2>
-<p>There are several ways to calculate coverage, i.e. count the number of
-bases mapped to positions on the reference. <code>samtools depth</code> will return
-three columns: reference, position, and coverage.</p>
+<p>Coverage can mean the:</p>
+<ol>
+<li>average depth of each covered base</li>
+<li>percentage of bases covered</li>
+</ol>
+<p><code>samtools depth</code> and <code>samtools mpileup</code> can be used to indicate the
+depth of each covered base (and used to calculate the average depth.
+<code>samtools coverage</code> will provide both the average depth and percentage
+of bases covered per chromosome/reference sequence.</p>
+<p><code>samtools depth</code> will return three columns: reference, position, and
+coverage.</p>
 <pre><code class="language-bash">samtools depth eg/ERR188273_chrX.bam | head
 </code></pre>
 <pre><code>## chrX 21649   1
@@ -812,8 +820,15 @@ three columns: reference, position, and coverage.</p>
 ## chrX 21657   1
 ## chrX 21658   1
 </code></pre>
-<p>The <code>samtools mpileup</code> command can also provide depth information (but
-not for reads that have a mapping quality of 0, by default) with some
+<p>The average depth can be calculated by summing the third column and
+dividing by the total number of bases (be sure to use <code>-a</code>).</p>
+<pre><code class="language-bash">samtools depth -@ 2 -a eg/ERR188273_chrX.bam | perl -ane '$t += $F[2]; END {$cov = $t / $.; printf &quot;Bases covered:\t%.3f\nCoverage:\t%.3f\n&quot;, $., $cov}'
+</code></pre>
+<pre><code>## Bases covered:   156040895.000
+## Coverage:    0.532
+</code></pre>
+<p>The <code>samtools mpileup</code> command also provides depth information (but not
+for reads that have a mapping quality of 0, by default) with some
 additional information:</p>
 <ol>
 <li>Sequence name</li>
@@ -870,15 +885,15 @@ post</a> on using
 <code>mpileup</code>.</p>
 <p><code>samtools coverage</code> will provide the following coverage statistics:</p>
 <ol>
-<li>rname - Reference name / chromosome</li>
-<li>startpos - Start position</li>
-<li>endpos - End position (or sequence length)</li>
-<li>numreads - Number reads aligned to the region (after filtering)</li>
-<li>covbases - Number of covered bases with depth >= 1</li>
-<li>coverage - Proportion of covered bases [0..1]</li>
-<li>meandepth - Mean depth of coverage</li>
-<li>meanbaseq - Mean base quality in covered region</li>
-<li>meanmapq - Mean mapping quality of selected reads</li>
+<li><code>rname</code> - Reference name / chromosome</li>
+<li><code>startpos</code> - Start position</li>
+<li><code>endpos</code> - End position (or sequence length)</li>
+<li><code>numreads</code> - Number reads aligned to the region (after filtering)</li>
+<li><code>covbases</code> - Number of covered bases with depth >= 1</li>
+<li><code>coverage</code> - Proportion of covered bases [0..1]</li>
+<li><code>meandepth</code> - Mean depth of coverage</li>
+<li><code>meanbaseq</code> - Mean base quality in covered region</li>
+<li><code>meanmapq</code> - Mean mapping quality of selected reads</li>
 </ol>
 <!-- end list -->
 
@@ -887,6 +902,13 @@ post</a> on using
 <pre><code>## #rname   startpos    endpos  numreads    covbases    coverage    meandepth   meanbaseq   meanmapq
 ## chrX 1   156040895   1110685 3402037 2.18022 0.532299    36.3    59.4
 </code></pre>
+<p>The example BAM file only contains reads for <code>chrX</code> hence the statistics
+are only returned for <code>chrX</code>.</p>
+<p>Returning to our coverage definition at the start of this section:</p>
+<ol>
+<li>average depth of each covered base = <code>meandepth</code></li>
+<li>percentage of bases covered = <code>covbases</code></li>
+</ol>
 <h2 id="stargazers-over-time">Stargazers over time</h2>
 <p><a href="https://starchart.cc/davetang/learning_bam_file"><img alt="Stargazers over
 time" src="https://starchart.cc/davetang/learning_bam_file.svg" /></a></p>
@@ -932,5 +954,5 @@ time" src="https://starchart.cc/davetang/learning_bam_file.svg" /></a></p>
 
 <!--
 MkDocs version : 1.3.0
-Build Date UTC : 2022-08-18 23:49:17.170286+00:00
+Build Date UTC : 2022-09-13 05:07:44.098824+00:00
 -->
