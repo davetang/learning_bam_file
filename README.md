@@ -30,7 +30,7 @@ Table of Contents
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
 
-Thu 18 Aug 2022 11:49:13 PM UTC
+Tue 13 Sep 2022 05:07:41 AM UTC
 
 Learning the BAM format
 ================
@@ -215,7 +215,7 @@ Size of SAM file.
 ls -lh eg/ERR188273_chrX.sam
 ```
 
-    ## -rw-r--r-- 1 root root 321M Aug 18 23:46 eg/ERR188273_chrX.sam
+    ## -rw-r--r-- 1 root root 321M Sep 13 05:03 eg/ERR188273_chrX.sam
 
 Size of BAM file.
 
@@ -223,7 +223,7 @@ Size of BAM file.
 ls -lh eg/ERR188273_chrX.bam
 ```
 
-    ## -rw-r--r-- 1 root root 67M Aug 18 23:44 eg/ERR188273_chrX.bam
+    ## -rw-r--r-- 1 root root 67M Sep 13 05:02 eg/ERR188273_chrX.bam
 
 We can use `head` to view a SAM file.
 
@@ -273,9 +273,9 @@ samtools view -T genome/chrX.fa -C -o eg/ERR188273_chrX.cram eg/ERR188273_chrX.b
 ls -lh eg/ERR188273_chrX.[sbcr]*am
 ```
 
-    ## -rw-r--r-- 1 root root  67M Aug 18 23:44 eg/ERR188273_chrX.bam
-    ## -rw-r--r-- 1 root root  40M Aug 18 23:46 eg/ERR188273_chrX.cram
-    ## -rw-r--r-- 1 root root 321M Aug 18 23:46 eg/ERR188273_chrX.sam
+    ## -rw-r--r-- 1 root root  67M Sep 13 05:02 eg/ERR188273_chrX.bam
+    ## -rw-r--r-- 1 root root  40M Sep 13 05:04 eg/ERR188273_chrX.cram
+    ## -rw-r--r-- 1 root root 321M Sep 13 05:03 eg/ERR188273_chrX.sam
 
 You can use `samtools view` to view a CRAM file just as you would for a
 BAM file.
@@ -312,8 +312,8 @@ ls -l eg/ERR188273_chrX.bam
 ls -l eg/sorted.bam
 ```
 
-    ## -rw-r--r-- 1 root root 69983526 Aug 18 23:44 eg/ERR188273_chrX.bam
-    ## -rw-r--r-- 1 root root 69983598 Aug 18 23:46 eg/sorted.bam
+    ## -rw-r--r-- 1 root root 69983526 Sep 13 05:02 eg/ERR188273_chrX.bam
+    ## -rw-r--r-- 1 root root 69983598 Sep 13 05:04 eg/sorted.bam
 
 You should use use additional threads (if they are available) to speed
 up sorting; to use four threads, use `-@ 4`.
@@ -325,9 +325,9 @@ time samtools sort eg/ERR188273_chrX.sam -o eg/sorted.bam
 ```
 
     ## 
-    ## real 0m10.403s
-    ## user 0m10.045s
-    ## sys  0m0.268s
+    ## real 0m10.557s
+    ## user 0m10.217s
+    ## sys  0m0.240s
 
 Time taken using four threads.
 
@@ -337,9 +337,9 @@ time samtools sort -@ 4 eg/ERR188273_chrX.sam -o eg/sorted.bam
 
     ## [bam_sort_core] merging from 0 files and 4 in-memory blocks...
     ## 
-    ## real 0m6.061s
-    ## user 0m11.180s
-    ## sys  0m0.378s
+    ## real 0m5.292s
+    ## user 0m9.641s
+    ## sys  0m0.325s
 
 Many of the SAMtools subtools can use additional threads, so make use of
 them if you have the resources\!
@@ -819,26 +819,26 @@ samtools mpileup -s -f test_ref.fa aln_bwa.bam aln_mm.bam | head -20
 ```
 
     ## [mpileup] 2 samples in 2 input files
-    ## 1    2466    C   1   ^]. B   ]   1   ^]. B   ]
-    ## 1    2467    C   1   .   E   ]   1   .   E   ]
-    ## 1    2468    T   1   .   J   ]   1   .   J   ]
-    ## 1    2469    G   1   .   J   ]   1   .   J   ]
-    ## 1    2470    A   1   .   J   ]   1   .   J   ]
-    ## 1    2471    C   1   .   J   ]   1   .   J   ]
-    ## 1    2472    T   1   .   J   ]   1   .   J   ]
-    ## 1    2473    G   1   .   J   ]   1   .   J   ]
-    ## 1    2474    T   1   .   J   ]   1   .   J   ]
-    ## 1    2475    T   1   .   J   ]   1   .   J   ]
-    ## 1    2476    G   1   .   J   ]   1   .   J   ]
-    ## 1    2477    G   1   .   J   ]   1   .   J   ]
-    ## 1    2478    G   1   .   J   ]   1   .   J   ]
-    ## 1    2479    A   1   .   J   ]   1   .   J   ]
-    ## 1    2480    C   1   .   J   ]   1   .   J   ]
-    ## 1    2481    G   1   .   J   ]   1   .   J   ]
-    ## 1    2482    A   1   .   J   ]   1   .   J   ]
-    ## 1    2483    A   1   .   J   ]   1   .   J   ]
-    ## 1    2484    A   1   .   J   ]   1   .   J   ]
-    ## 1    2485    A   1   .   J   ]   1   .   J   ]
+    ## 1    1694    C   1   ^]. D   ]   1   ^]. D   ]
+    ## 1    1695    G   1   .   I   ]   1   .   I   ]
+    ## 1    1696    T   1   .   J   ]   1   .   J   ]
+    ## 1    1697    T   1   .   J   ]   1   .   J   ]
+    ## 1    1698    A   1   .   J   ]   1   .   J   ]
+    ## 1    1699    A   1   .   J   ]   1   .   J   ]
+    ## 1    1700    T   1   .   J   ]   1   .   J   ]
+    ## 1    1701    C   1   .   J   ]   1   .   J   ]
+    ## 1    1702    A   1   .   J   ]   1   .   J   ]
+    ## 1    1703    A   1   .   J   ]   1   .   J   ]
+    ## 1    1704    T   1   .   J   ]   1   .   J   ]
+    ## 1    1705    C   1   .   J   ]   1   .   J   ]
+    ## 1    1706    C   1   .   J   ]   1   .   J   ]
+    ## 1    1707    C   1   .   J   ]   1   .   J   ]
+    ## 1    1708    C   1   .   J   ]   1   .   J   ]
+    ## 1    1709    C   1   .   J   ]   1   .   J   ]
+    ## 1    1710    A   1   .   J   ]   1   .   J   ]
+    ## 1    1711    A   1   .   J   ]   1   .   J   ]
+    ## 1    1712    C   1   .   J   ]   1   .   J   ]
+    ## 1    1713    A   1   .   J   ]   1   .   J   ]
 
 Another approach is to use
 [deepTools](https://deeptools.readthedocs.io/en/develop/) and the
@@ -898,9 +898,18 @@ samtools view eg/ERR188273_X.bam | head -2
 
 ## Coverage
 
-There are several ways to calculate coverage, i.e. count the number of
-bases mapped to positions on the reference. `samtools depth` will return
-three columns: reference, position, and coverage.
+Coverage can mean the:
+
+1.  average depth of each covered base
+2.  percentage of bases covered
+
+`samtools depth` and `samtools mpileup` can be used to indicate the
+depth of each covered base (and used to calculate the average depth.
+`samtools coverage` will provide both the average depth and percentage
+of bases covered per chromosome/reference sequence.
+
+`samtools depth` will return three columns: reference, position, and
+coverage.
 
 ``` bash
 samtools depth eg/ERR188273_chrX.bam | head
@@ -917,8 +926,18 @@ samtools depth eg/ERR188273_chrX.bam | head
     ## chrX 21657   1
     ## chrX 21658   1
 
-The `samtools mpileup` command can also provide depth information (but
-not for reads that have a mapping quality of 0, by default) with some
+The average depth can be calculated by summing the third column and
+dividing by the total number of bases (be sure to use `-a`).
+
+``` bash
+samtools depth -@ 2 -a eg/ERR188273_chrX.bam | perl -ane '$t += $F[2]; END {$cov = $t / $.; printf "Bases covered:\t%.3f\nCoverage:\t%.3f\n", $., $cov}'
+```
+
+    ## Bases covered:   156040895.000
+    ## Coverage:    0.532
+
+The `samtools mpileup` command also provides depth information (but not
+for reads that have a mapping quality of 0, by default) with some
 additional information:
 
 1.  Sequence name
@@ -982,15 +1001,15 @@ post](https://davetang.org/muse/2015/08/26/samtools-mpileup/) on using
 
 `samtools coverage` will provide the following coverage statistics:
 
-1.  rname - Reference name / chromosome
-2.  startpos - Start position
-3.  endpos - End position (or sequence length)
-4.  numreads - Number reads aligned to the region (after filtering)
-5.  covbases - Number of covered bases with depth \>= 1
-6.  coverage - Proportion of covered bases \[0..1\]
-7.  meandepth - Mean depth of coverage
-8.  meanbaseq - Mean base quality in covered region
-9.  meanmapq - Mean mapping quality of selected reads
+1.  `rname` - Reference name / chromosome
+2.  `startpos` - Start position
+3.  `endpos` - End position (or sequence length)
+4.  `numreads` - Number reads aligned to the region (after filtering)
+5.  `covbases` - Number of covered bases with depth \>= 1
+6.  `coverage` - Proportion of covered bases \[0..1\]
+7.  `meandepth` - Mean depth of coverage
+8.  `meanbaseq` - Mean base quality in covered region
+9.  `meanmapq` - Mean mapping quality of selected reads
 
 <!-- end list -->
 
@@ -1000,6 +1019,14 @@ samtools coverage eg/ERR188273_chrX.bam
 
     ## #rname   startpos    endpos  numreads    covbases    coverage    meandepth   meanbaseq   meanmapq
     ## chrX 1   156040895   1110685 3402037 2.18022 0.532299    36.3    59.4
+
+The example BAM file only contains reads for `chrX` hence the statistics
+are only returned for `chrX`.
+
+Returning to our coverage definition at the start of this section:
+
+1.  average depth of each covered base = `meandepth`
+2.  percentage of bases covered = `covbases`
 
 ## Stargazers over time
 
