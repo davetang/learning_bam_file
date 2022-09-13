@@ -469,13 +469,29 @@ samtools view eg/ERR188273_X.bam | head -2
 
 ## Coverage
 
-There are several ways to calculate coverage, i.e. count the number of bases mapped to positions on the reference. `samtools depth` will return three columns: reference, position, and coverage.
+Coverage can mean the:
+
+1. average depth of each covered base
+2. percentage of bases covered
+
+`samtools depth` and `samtools mpileup` can be used to indicate the depth of
+each covered base (and used to calculate the average depth. `samtools coverage`
+will provide both the average depth and percentage of bases covered per
+chromosome/reference sequence.
+
+`samtools depth` will return three columns: reference, position, and coverage.
 
 ```{bash engine.opts='-l'}
 samtools depth eg/ERR188273_chrX.bam | head
 ```
 
-The `samtools mpileup` command can also provide depth information (but not for reads that have a mapping quality of 0, by default) with some additional information:
+The average depth can be calculated by summing the third column and dividing by the total number of bases (be sure to use `-a`).
+
+```{bash engine.opts='-l'}
+samtools depth -@ 2 -a eg/ERR188273_chrX.bam | perl -ane '$t += $F[2]; END {$cov = $t / $.; printf "Bases covered:\t%.3f\nCoverage:\t%.3f\n", $., $cov}'
+```
+
+The `samtools mpileup` command also provides depth information (but not for reads that have a mapping quality of 0, by default) with some additional information:
 
 1. Sequence name
 2. 1-based coordinate
@@ -501,19 +517,26 @@ I have an [old blog post](https://davetang.org/muse/2015/08/26/samtools-mpileup/
 
 `samtools coverage` will provide the following coverage statistics:
 
-1. rname - Reference name / chromosome
-2. startpos - Start position
-3. endpos - End position (or sequence length)
-4. numreads - Number reads aligned to the region (after filtering)
-5. covbases - Number of covered bases with depth >= 1
-6. coverage - Proportion of covered bases [0..1]
-7. meandepth - Mean depth of coverage
-8. meanbaseq - Mean base quality in covered region
-9. meanmapq - Mean mapping quality of selected reads
+1. `rname` - Reference name / chromosome
+2. `startpos` - Start position
+3. `endpos` - End position (or sequence length)
+4. `numreads` - Number reads aligned to the region (after filtering)
+5. `covbases` - Number of covered bases with depth >= 1
+6. `coverage` - Proportion of covered bases [0..1]
+7. `meandepth` - Mean depth of coverage
+8. `meanbaseq` - Mean base quality in covered region
+9. `meanmapq` - Mean mapping quality of selected reads
 
 ```{bash engine.opts='-l'}
 samtools coverage eg/ERR188273_chrX.bam
 ```
+
+The example BAM file only contains reads for `chrX` hence the statistics are only returned for `chrX`.
+
+Returning to our coverage definition at the start of this section:
+
+1. average depth of each covered base = `meandepth`
+2. percentage of bases covered = `covbases`
 
 ## Stargazers over time
 
