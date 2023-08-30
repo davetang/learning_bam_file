@@ -2,7 +2,7 @@ all: readme
 data: genome/chrX.fa
 tools: github-markdown-toc samtools pandoc bwa minimap2
 pandoc: /usr/bin/pandoc
-samtools_ver = 1.16
+samtools_ver = 1.18
 minimap2_ver = 2.24
 
 genome/chrX.fa:
