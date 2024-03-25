@@ -548,12 +548,6 @@ mosdepth ERR188275 eg/ERR188273_chrX.bam
 gunzip -c ERR188273.per-base.bed.gz | head
 ```
 
-`mosdepth` summary.
-
-```{bash engine.opts='-l'}
-cat ERR188273.mosdepth.summary.txt
-```
-
 Coverage in using a 500 bp window.
 
 ```{bash engine.opts='-l'}
