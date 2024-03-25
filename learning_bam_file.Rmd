@@ -544,15 +544,21 @@ Returning to our coverage definition at the start of this section:
 The [mosdepth](https://github.com/brentp/mosdepth) tool can also calculate depth (and much faster than `samtools depth`) per base or within a given window. The output is given in a BED file, where the fourth column indicates the coverage.
 
 ```{bash engine.opts='-l'}
-mosdepth ERR188275 eg/ERR188273_chrX.bam
+mosdepth ERR188273 eg/ERR188273_chrX.bam
 gunzip -c ERR188273.per-base.bed.gz | head
+```
+
+`mosdepth` coverage.
+
+```{bash engine.opts='-l'}
+cat ERR188273.mosdepth.summary.txt
 ```
 
 Coverage in using a 500 bp window.
 
 ```{bash engine.opts='-l'}
-mosdepth -n --fast-mode --by 500 ERR188275_500 eg/ERR188273_chrX.bam
-gunzip -c ERR188275_500.regions.bed.gz | head
+mosdepth -n --fast-mode --by 500 ERR188273_500 eg/ERR188273_chrX.bam
+gunzip -c ERR188273_500.regions.bed.gz | head
 ```
 
 ## Stargazers over time
