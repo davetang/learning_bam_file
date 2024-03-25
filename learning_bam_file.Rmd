@@ -482,13 +482,14 @@ chromosome/reference sequence.
 `samtools depth` will return three columns: reference, position, and coverage.
 
 ```{bash engine.opts='-l'}
-samtools depth eg/ERR188273_chrX.bam | head
+samtools depth -@ 4 eg/ERR188273_chrX.bam > ERR188273_depth.tsv
+head ERR188273_depth.tsv
 ```
 
-The average depth can be calculated by summing the third column and dividing by the total number of bases (be sure to use `-a`).
+The average depth can be calculated by summing the third column and dividing by the total number of bases (be sure to use `-a` with `samtools depth` as that will output all positions including zero depth).
 
 ```{bash engine.opts='-l'}
-samtools depth -@ 2 -a eg/ERR188273_chrX.bam | perl -ane '$t += $F[2]; END {$cov = $t / $.; printf "Bases covered:\t%.3f\nCoverage:\t%.3f\n", $., $cov}'
+samtools depth -@ 4 -a eg/ERR188273_chrX.bam | perl -ane '$t += $F[2]; END {$cov = $t / $.; printf "Bases covered:\t%.3f\nCoverage:\t%.3f\n", $., $cov}'
 ```
 
 The `samtools mpileup` command also provides depth information (but not for reads that have a mapping quality of 0, by default) with some additional information:
@@ -502,13 +503,15 @@ The `samtools mpileup` command also provides depth information (but not for read
 7. Alignment mapping qualities (when used with `-s`)
 
 ```{bash engine.opts='-l'}
-samtools mpileup -f genome/chrX.fa -s eg/ERR188273_chrX.bam | head
+samtools mpileup -f genome/chrX.fa -s eg/ERR188273_chrX.bam > ERR188273_mpileup.tsv
+head ERR188273_mpileup.tsv
 ```
 
 Note that the start of the `samtools mpileup` output differ from the start of the `samtools depth` output. This is because `mpileup` performs some filtering by default. In the case of this example, read pairs that are not both mapped will be ignored. To count these "orphan" reads, use the `--count-orphans` argument.
 
 ```{bash engine.opts='-l'}
-samtools mpileup -f genome/chrX.fa --count-orphans -s eg/ERR188273_chrX.bam | head
+samtools mpileup -f genome/chrX.fa --count-orphans -s eg/ERR188273_chrX.bam > ERR188273_mpileup_orphans.tsv
+head ERR188273_mpileup_orphans.tsv
 ```
 
 In addition `mpileup` performs "per-Base Alignment Quality" (BAQ) by default and will adjust base quality scores. The default behaviour to to skip bases with baseQ/BAQ smaller than 13. If you are finding discrepancies between `mpileup`'s coverage calculation with another coverage tool, you can either set `--min-BQ` to `0` or use `--no-BAQ` to disable BAQ.
@@ -537,6 +540,19 @@ Returning to our coverage definition at the start of this section:
 
 1. average depth of each covered base = `meandepth`
 2. percentage of bases covered = `covbases`
+
+The [mosdepth](https://github.com/brentp/mosdepth) tool can also calculate depth (and much faster than `samtools depth`) per base or within a given window. The output is given in a BED file, where the fourth column indicates the coverage.
+
+```{bash engine.opts='-l'}
+mosdepth ERR188275 eg/ERR188273_chrX.bam
+gunzip -c ERR188273.per-base.bed.gz | head
+```
+
+`mosdepth` summary.
+
+```{bash engine.opts='-l'}
+cat ERR188273.mosdepth.summary.txt
+```
 
 ## Stargazers over time
 
