@@ -270,12 +270,12 @@ and are faster to process.</p>
 <p>Size of SAM file.</p>
 <pre><code class="language-bash">ls -lh eg/ERR188273_chrX.sam
 </code></pre>
-<pre><code>## -rw-r--r-- 1 root root 321M Mar 25 07:18 eg/ERR188273_chrX.sam
+<pre><code>## -rw-r--r-- 1 root root 321M Mar 25 07:28 eg/ERR188273_chrX.sam
 </code></pre>
 <p>Size of BAM file.</p>
 <pre><code class="language-bash">ls -lh eg/ERR188273_chrX.bam
 </code></pre>
-<pre><code>## -rw-r--r-- 1 root root 67M Mar 25 07:16 eg/ERR188273_chrX.bam
+<pre><code>## -rw-r--r-- 1 root root 67M Mar 25 07:27 eg/ERR188273_chrX.bam
 </code></pre>
 <p>We can use <code>head</code> to view a SAM file.</p>
 <pre><code class="language-bash">head eg/ERR188273_chrX.sam
@@ -312,9 +312,9 @@ and <code>-C</code> arguments to convert a BAM file into CRAM.</p>
 
 ls -lh eg/ERR188273_chrX.[sbcr]*am
 </code></pre>
-<pre><code>## -rw-r--r-- 1 root root  67M Mar 25 07:16 eg/ERR188273_chrX.bam
-## -rw-r--r-- 1 root root  40M Mar 25 07:18 eg/ERR188273_chrX.cram
-## -rw-r--r-- 1 root root 321M Mar 25 07:18 eg/ERR188273_chrX.sam
+<pre><code>## -rw-r--r-- 1 root root  67M Mar 25 07:27 eg/ERR188273_chrX.bam
+## -rw-r--r-- 1 root root  40M Mar 25 07:28 eg/ERR188273_chrX.cram
+## -rw-r--r-- 1 root root 321M Mar 25 07:28 eg/ERR188273_chrX.sam
 </code></pre>
 <p>You can use <code>samtools view</code> to view a CRAM file just as you would for a
 BAM file.</p>
@@ -343,8 +343,8 @@ sorted BAM file from a SAM file.</p>
 ls -l eg/ERR188273_chrX.bam
 ls -l eg/sorted.bam
 </code></pre>
-<pre><code>## -rw-r--r-- 1 root root 69983526 Mar 25 07:16 eg/ERR188273_chrX.bam
-## -rw-r--r-- 1 root root 69983599 Mar 25 07:18 eg/sorted.bam
+<pre><code>## -rw-r--r-- 1 root root 69983526 Mar 25 07:27 eg/ERR188273_chrX.bam
+## -rw-r--r-- 1 root root 69983599 Mar 25 07:29 eg/sorted.bam
 </code></pre>
 <p>You should use use additional threads (if they are available) to speed
 up sorting; to use four threads, use <code>-@ 4</code>.</p>
@@ -352,18 +352,18 @@ up sorting; to use four threads, use <code>-@ 4</code>.</p>
 <pre><code class="language-bash">time samtools sort eg/ERR188273_chrX.sam -o eg/sorted.bam
 </code></pre>
 <pre><code>## 
-## real 0m8.755s
-## user 0m8.460s
-## sys  0m0.248s
+## real 0m8.748s
+## user 0m8.458s
+## sys  0m0.244s
 </code></pre>
 <p>Time taken using four threads.</p>
 <pre><code class="language-bash">time samtools sort -@ 4 eg/ERR188273_chrX.sam -o eg/sorted.bam
 </code></pre>
 <pre><code>## [bam_sort_core] merging from 0 files and 4 in-memory blocks...
 ## 
-## real 0m2.905s
-## user 0m10.518s
-## sys  0m0.505s
+## real 0m2.896s
+## user 0m10.513s
+## sys  0m0.484s
 </code></pre>
 <p>Many of the SAMtools subtools can use additional threads, so make use of
 them if you have the resources!</p>
@@ -736,26 +736,26 @@ minimap2 -ax sr test_ref.fa l${len}_n${n}_d${m}_1984_1.fq.gz l${len}_n${n}_d${m}
 <pre><code class="language-bash">samtools mpileup -s -f test_ref.fa aln_bwa.bam aln_mm.bam | head -20
 </code></pre>
 <pre><code>## [mpileup] 2 samples in 2 input files
-## 1    4020    C   1   ^]. E   ]   1   ^]. E   ]
-## 1    4021    T   1   .   J   ]   1   .   J   ]
-## 1    4022    C   1   .   J   ]   1   .   J   ]
-## 1    4023    T   1   .   J   ]   1   .   J   ]
-## 1    4024    G   1   .   J   ]   1   .   J   ]
-## 1    4025    T   1   .   J   ]   1   .   J   ]
-## 1    4026    T   1   .   J   ]   1   .   J   ]
-## 1    4027    A   1   .   J   ]   1   .   J   ]
-## 1    4028    T   1   .   J   ]   1   .   J   ]
-## 1    4029    A   1   .   J   ]   1   .   J   ]
-## 1    4030    G   1   .   J   ]   1   .   J   ]
-## 1    4031    C   1   .   J   ]   1   .   J   ]
-## 1    4032    G   1   .   J   ]   1   .   J   ]
-## 1    4033    G   1   .   J   ]   1   .   J   ]
-## 1    4034    G   1   .   J   ]   1   .   J   ]
-## 1    4035    A   1   .   J   ]   1   .   J   ]
-## 1    4036    T   1   .   J   ]   1   .   J   ]
-## 1    4037    T   1   .   J   ]   1   .   J   ]
-## 1    4038    A   1   .   J   ]   1   .   J   ]
-## 1    4039    C   1   .   J   ]   1   .   J   ]
+## 1    8238    G   1   ^]. &gt;   ]   1   ^]. &gt;   ]
+## 1    8239    G   1   .   &gt;   ]   1   .   &gt;   ]
+## 1    8240    A   1   .   J   ]   1   .   J   ]
+## 1    8241    C   1   .   J   ]   1   .   J   ]
+## 1    8242    A   1   .   J   ]   1   .   J   ]
+## 1    8243    C   1   .   J   ]   1   .   J   ]
+## 1    8244    T   1   .   J   ]   1   .   J   ]
+## 1    8245    G   1   .   J   ]   1   .   J   ]
+## 1    8246    C   1   .   J   ]   1   .   J   ]
+## 1    8247    G   1   .   J   ]   1   .   J   ]
+## 1    8248    A   1   .   J   ]   1   .   J   ]
+## 1    8249    C   1   .   J   ]   1   .   J   ]
+## 1    8250    A   1   .   J   ]   1   .   J   ]
+## 1    8251    G   1   .   J   ]   1   .   J   ]
+## 1    8252    T   1   .   J   ]   1   .   J   ]
+## 1    8253    G   1   .   J   ]   1   .   J   ]
+## 1    8254    A   1   .   J   ]   1   .   J   ]
+## 1    8255    G   1   .   J   ]   1   .   J   ]
+## 1    8256    G   1   .   J   ]   1   .   J   ]
+## 1    8257    G   1   .   J   ]   1   .   J   ]
 </code></pre>
 <p>Another approach is to use
 <a href="https://deeptools.readthedocs.io/en/develop/">deepTools</a> and the
@@ -920,14 +920,30 @@ are only returned for <code>chrX</code>.</p>
 calculate depth (and much faster than <code>samtools depth</code>) per base or
 within a given window. The output is given in a BED file, where the
 fourth column indicates the coverage.</p>
-<pre><code class="language-bash">mosdepth ERR188275 eg/ERR188273_chrX.bam
+<pre><code class="language-bash">mosdepth ERR188273 eg/ERR188273_chrX.bam
 gunzip -c ERR188273.per-base.bed.gz | head
 </code></pre>
-<pre><code>## gzip: ERR188273.per-base.bed.gz: No such file or directory
+<pre><code>## chrX 0   21648   0
+## chrX 21648   21718   1
+## chrX 21718   251270  0
+## chrX 251270  251391  1
+## chrX 251391  265950  0
+## chrX 265950  266021  1
+## chrX 266021  266096  2
+## chrX 266096  269848  0
+## chrX 269848  269923  1
+## chrX 269923  270095  0
+</code></pre>
+<p><code>mosdepth</code> coverage.</p>
+<pre><code class="language-bash">cat ERR188273.mosdepth.summary.txt
+</code></pre>
+<pre><code>## chrom    length  bases   mean    min max
+## chrX 156040895   76303957    0.49    0   40804
+## total    156040895   76303957    0.49    0   40804
 </code></pre>
 <p>Coverage in using a 500 bp window.</p>
-<pre><code class="language-bash">mosdepth -n --fast-mode --by 500 ERR188275_500 eg/ERR188273_chrX.bam
-gunzip -c ERR188275_500.regions.bed.gz | head
+<pre><code class="language-bash">mosdepth -n --fast-mode --by 500 ERR188273_500 eg/ERR188273_chrX.bam
+gunzip -c ERR188273_500.regions.bed.gz | head
 </code></pre>
 <pre><code>## chrX 0   500 0.00
 ## chrX 500 1000    0.00
@@ -985,5 +1001,5 @@ time" src="https://starchart.cc/davetang/learning_bam_file.svg" /></a></p>
 
 <!--
 MkDocs version : 1.3.0
-Build Date UTC : 2024-03-25 07:22:47.369318+00:00
+Build Date UTC : 2024-03-25 07:33:12.033695+00:00
 -->
