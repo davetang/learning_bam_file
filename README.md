@@ -30,7 +30,7 @@ Table of Contents
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
 
-Mon 25 Mar 2024 07:22:45 AM UTC
+Mon 25 Mar 2024 07:33:09 AM UTC
 
 Learning the BAM format
 ================
@@ -217,7 +217,7 @@ Size of SAM file.
 ls -lh eg/ERR188273_chrX.sam
 ```
 
-    ## -rw-r--r-- 1 root root 321M Mar 25 07:18 eg/ERR188273_chrX.sam
+    ## -rw-r--r-- 1 root root 321M Mar 25 07:28 eg/ERR188273_chrX.sam
 
 Size of BAM file.
 
@@ -225,7 +225,7 @@ Size of BAM file.
 ls -lh eg/ERR188273_chrX.bam
 ```
 
-    ## -rw-r--r-- 1 root root 67M Mar 25 07:16 eg/ERR188273_chrX.bam
+    ## -rw-r--r-- 1 root root 67M Mar 25 07:27 eg/ERR188273_chrX.bam
 
 We can use `head` to view a SAM file.
 
@@ -275,9 +275,9 @@ samtools view -T genome/chrX.fa -C -o eg/ERR188273_chrX.cram eg/ERR188273_chrX.b
 ls -lh eg/ERR188273_chrX.[sbcr]*am
 ```
 
-    ## -rw-r--r-- 1 root root  67M Mar 25 07:16 eg/ERR188273_chrX.bam
-    ## -rw-r--r-- 1 root root  40M Mar 25 07:18 eg/ERR188273_chrX.cram
-    ## -rw-r--r-- 1 root root 321M Mar 25 07:18 eg/ERR188273_chrX.sam
+    ## -rw-r--r-- 1 root root  67M Mar 25 07:27 eg/ERR188273_chrX.bam
+    ## -rw-r--r-- 1 root root  40M Mar 25 07:28 eg/ERR188273_chrX.cram
+    ## -rw-r--r-- 1 root root 321M Mar 25 07:28 eg/ERR188273_chrX.sam
 
 You can use `samtools view` to view a CRAM file just as you would for a
 BAM file.
@@ -314,8 +314,8 @@ ls -l eg/ERR188273_chrX.bam
 ls -l eg/sorted.bam
 ```
 
-    ## -rw-r--r-- 1 root root 69983526 Mar 25 07:16 eg/ERR188273_chrX.bam
-    ## -rw-r--r-- 1 root root 69983599 Mar 25 07:18 eg/sorted.bam
+    ## -rw-r--r-- 1 root root 69983526 Mar 25 07:27 eg/ERR188273_chrX.bam
+    ## -rw-r--r-- 1 root root 69983599 Mar 25 07:29 eg/sorted.bam
 
 You should use use additional threads (if they are available) to speed
 up sorting; to use four threads, use `-@ 4`.
@@ -327,9 +327,9 @@ time samtools sort eg/ERR188273_chrX.sam -o eg/sorted.bam
 ```
 
     ## 
-    ## real 0m8.755s
-    ## user 0m8.460s
-    ## sys  0m0.248s
+    ## real 0m8.748s
+    ## user 0m8.458s
+    ## sys  0m0.244s
 
 Time taken using four threads.
 
@@ -339,9 +339,9 @@ time samtools sort -@ 4 eg/ERR188273_chrX.sam -o eg/sorted.bam
 
     ## [bam_sort_core] merging from 0 files and 4 in-memory blocks...
     ## 
-    ## real 0m2.905s
-    ## user 0m10.518s
-    ## sys  0m0.505s
+    ## real 0m2.896s
+    ## user 0m10.513s
+    ## sys  0m0.484s
 
 Many of the SAMtools subtools can use additional threads, so make use of
 them if you have the resources\!
@@ -821,26 +821,26 @@ samtools mpileup -s -f test_ref.fa aln_bwa.bam aln_mm.bam | head -20
 ```
 
     ## [mpileup] 2 samples in 2 input files
-    ## 1    4020    C   1   ^]. E   ]   1   ^]. E   ]
-    ## 1    4021    T   1   .   J   ]   1   .   J   ]
-    ## 1    4022    C   1   .   J   ]   1   .   J   ]
-    ## 1    4023    T   1   .   J   ]   1   .   J   ]
-    ## 1    4024    G   1   .   J   ]   1   .   J   ]
-    ## 1    4025    T   1   .   J   ]   1   .   J   ]
-    ## 1    4026    T   1   .   J   ]   1   .   J   ]
-    ## 1    4027    A   1   .   J   ]   1   .   J   ]
-    ## 1    4028    T   1   .   J   ]   1   .   J   ]
-    ## 1    4029    A   1   .   J   ]   1   .   J   ]
-    ## 1    4030    G   1   .   J   ]   1   .   J   ]
-    ## 1    4031    C   1   .   J   ]   1   .   J   ]
-    ## 1    4032    G   1   .   J   ]   1   .   J   ]
-    ## 1    4033    G   1   .   J   ]   1   .   J   ]
-    ## 1    4034    G   1   .   J   ]   1   .   J   ]
-    ## 1    4035    A   1   .   J   ]   1   .   J   ]
-    ## 1    4036    T   1   .   J   ]   1   .   J   ]
-    ## 1    4037    T   1   .   J   ]   1   .   J   ]
-    ## 1    4038    A   1   .   J   ]   1   .   J   ]
-    ## 1    4039    C   1   .   J   ]   1   .   J   ]
+    ## 1    8238    G   1   ^]. >   ]   1   ^]. >   ]
+    ## 1    8239    G   1   .   >   ]   1   .   >   ]
+    ## 1    8240    A   1   .   J   ]   1   .   J   ]
+    ## 1    8241    C   1   .   J   ]   1   .   J   ]
+    ## 1    8242    A   1   .   J   ]   1   .   J   ]
+    ## 1    8243    C   1   .   J   ]   1   .   J   ]
+    ## 1    8244    T   1   .   J   ]   1   .   J   ]
+    ## 1    8245    G   1   .   J   ]   1   .   J   ]
+    ## 1    8246    C   1   .   J   ]   1   .   J   ]
+    ## 1    8247    G   1   .   J   ]   1   .   J   ]
+    ## 1    8248    A   1   .   J   ]   1   .   J   ]
+    ## 1    8249    C   1   .   J   ]   1   .   J   ]
+    ## 1    8250    A   1   .   J   ]   1   .   J   ]
+    ## 1    8251    G   1   .   J   ]   1   .   J   ]
+    ## 1    8252    T   1   .   J   ]   1   .   J   ]
+    ## 1    8253    G   1   .   J   ]   1   .   J   ]
+    ## 1    8254    A   1   .   J   ]   1   .   J   ]
+    ## 1    8255    G   1   .   J   ]   1   .   J   ]
+    ## 1    8256    G   1   .   J   ]   1   .   J   ]
+    ## 1    8257    G   1   .   J   ]   1   .   J   ]
 
 Another approach is to use
 [deepTools](https://deeptools.readthedocs.io/en/develop/) and the
@@ -1041,17 +1041,36 @@ within a given window. The output is given in a BED file, where the
 fourth column indicates the coverage.
 
 ``` bash
-mosdepth ERR188275 eg/ERR188273_chrX.bam
+mosdepth ERR188273 eg/ERR188273_chrX.bam
 gunzip -c ERR188273.per-base.bed.gz | head
 ```
 
-    ## gzip: ERR188273.per-base.bed.gz: No such file or directory
+    ## chrX 0   21648   0
+    ## chrX 21648   21718   1
+    ## chrX 21718   251270  0
+    ## chrX 251270  251391  1
+    ## chrX 251391  265950  0
+    ## chrX 265950  266021  1
+    ## chrX 266021  266096  2
+    ## chrX 266096  269848  0
+    ## chrX 269848  269923  1
+    ## chrX 269923  270095  0
+
+`mosdepth` coverage.
+
+``` bash
+cat ERR188273.mosdepth.summary.txt
+```
+
+    ## chrom    length  bases   mean    min max
+    ## chrX 156040895   76303957    0.49    0   40804
+    ## total    156040895   76303957    0.49    0   40804
 
 Coverage in using a 500 bp window.
 
 ``` bash
-mosdepth -n --fast-mode --by 500 ERR188275_500 eg/ERR188273_chrX.bam
-gunzip -c ERR188275_500.regions.bed.gz | head
+mosdepth -n --fast-mode --by 500 ERR188273_500 eg/ERR188273_chrX.bam
+gunzip -c ERR188273_500.regions.bed.gz | head
 ```
 
     ## chrX 0   500 0.00
