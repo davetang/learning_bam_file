@@ -554,6 +554,13 @@ gunzip -c ERR188273.per-base.bed.gz | head
 cat ERR188273.mosdepth.summary.txt
 ```
 
+Coverage in using a 500 bp window.
+
+```{bash engine.opts='-l'}
+mosdepth -n --fast-mode --by 500 ERR188275_500 eg/ERR188273_chrX.bam
+gunzip -c ERR188275_500.regions.bed.gz | head
+```
+
 ## Stargazers over time
 
 [![Stargazers over time](https://starchart.cc/davetang/learning_bam_file.svg)](https://starchart.cc/davetang/learning_bam_file)
