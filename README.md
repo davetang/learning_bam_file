@@ -30,7 +30,7 @@ Table of Contents
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
 
-Mon 25 Mar 2024 07:33:09 AM UTC
+Mon 04 Aug 2025 12:34:53 AM UTC
 
 Learning the BAM format
 ================
@@ -124,7 +124,7 @@ samtools --help
 
     ## 
     ## Program: samtools (Tools for alignments in the SAM format)
-    ## Version: 1.19.2 (using htslib 1.19.1)
+    ## Version: 1.22.1 (using htslib 1.22.1)
     ## 
     ## Usage:   samtools <command> [options]
     ## 
@@ -169,6 +169,7 @@ samtools --help
     ##      phase          phase heterozygotes
     ##      stats          generate stats (former bamcheck)
     ##      ampliconstats  generate amplicon specific stats
+    ##      checksum       produce order-agnostic checksums of sequence content
     ## 
     ##   -- Viewing
     ##      flags          explain BAM flags
@@ -217,7 +218,7 @@ Size of SAM file.
 ls -lh eg/ERR188273_chrX.sam
 ```
 
-    ## -rw-r--r-- 1 root root 321M Mar 25 07:28 eg/ERR188273_chrX.sam
+    ## -rw-r--r-- 1 root root 321M Aug  4 00:30 eg/ERR188273_chrX.sam
 
 Size of BAM file.
 
@@ -225,7 +226,7 @@ Size of BAM file.
 ls -lh eg/ERR188273_chrX.bam
 ```
 
-    ## -rw-r--r-- 1 root root 67M Mar 25 07:27 eg/ERR188273_chrX.bam
+    ## -rw-r--r-- 1 root root 67M Aug  4 00:29 eg/ERR188273_chrX.bam
 
 We can use `head` to view a SAM file.
 
@@ -236,7 +237,7 @@ head eg/ERR188273_chrX.sam
     ## @HD  VN:1.0  SO:coordinate
     ## @SQ  SN:chrX LN:156040895
     ## @PG  ID:hisat2   PN:hisat2   VN:2.2.0    CL:"/Users/dtang/github/rnaseq/hisat2/../src/hisat2-2.2.0/hisat2-align-s --wrapper basic-0 --dta -p 4 -x ../raw/chrX_data/indexes/chrX_tran -1 /tmp/4195.inpipe1 -2 /tmp/4195.inpipe2"
-    ## @PG  ID:samtools PN:samtools PP:hisat2   VN:1.19.2   CL:samtools view -h eg/ERR188273_chrX.bam
+    ## @PG  ID:samtools PN:samtools PP:hisat2   VN:1.22.1   CL:samtools view -h eg/ERR188273_chrX.bam
     ## ERR188273.4711308    73  chrX    21649   0   5S70M   =   21649   0   CGGGTGATCACGAGGTCAGGAGATCAAGACCATCCTGGCCAACACAGTGAAACCCCATCTCTACTAAAAATACAA @@@F=DDFFHGHBHIFFHIGGIFGEGHFHIGIGIFIIIGIGIGGDHIIGIIC@>DGHCHHHGHHFFFFFDEACC@ AS:i:-5 ZS:i:-5 XN:i:0  XM:i:0  XO:i:0  XG:i:0  NM:i:0  MD:Z:70 YT:Z:UP NH:i:2
     ## ERR188273.4711308    133 chrX    21649   0   *   =   21649   0   CTACAGGTGCCCGCCACCATGCCCAGCTAATTTTTTTTGTATTTTTAGTAGAGATGGGGTTTCACTGTGTTGGCC CB@FDFFFHHGFHIJJJJIIIIIIIGGGIJGIIJJJJJJFFHIIIIGECHEHHGGHHFF?AACCDDDDDDDDBCD YT:Z:UP
     ## ERR188273.4711308    329 chrX    233717  0   5S70M   =   233717  0   CGGGTGATCACGAGGTCAGGAGATCAAGACCATCCTGGCCAACACAGTGAAACCCCATCTCTACTAAAAATACAA @@@F=DDFFHGHBHIFFHIGGIFGEGHFHIGIGIFIIIGIGIGGDHIIGIIC@>DGHCHHHGHHFFFFFDEACC@ AS:i:-5 ZS:i:-5 XN:i:0  XM:i:0  XO:i:0  XG:i:0  NM:i:0  MD:Z:70 YT:Z:UP NH:i:2
@@ -275,9 +276,9 @@ samtools view -T genome/chrX.fa -C -o eg/ERR188273_chrX.cram eg/ERR188273_chrX.b
 ls -lh eg/ERR188273_chrX.[sbcr]*am
 ```
 
-    ## -rw-r--r-- 1 root root  67M Mar 25 07:27 eg/ERR188273_chrX.bam
-    ## -rw-r--r-- 1 root root  40M Mar 25 07:28 eg/ERR188273_chrX.cram
-    ## -rw-r--r-- 1 root root 321M Mar 25 07:28 eg/ERR188273_chrX.sam
+    ## -rw-r--r-- 1 root root  67M Aug  4 00:29 eg/ERR188273_chrX.bam
+    ## -rw-r--r-- 1 root root  38M Aug  4 00:30 eg/ERR188273_chrX.cram
+    ## -rw-r--r-- 1 root root 321M Aug  4 00:30 eg/ERR188273_chrX.sam
 
 You can use `samtools view` to view a CRAM file just as you would for a
 BAM file.
@@ -314,8 +315,8 @@ ls -l eg/ERR188273_chrX.bam
 ls -l eg/sorted.bam
 ```
 
-    ## -rw-r--r-- 1 root root 69983526 Mar 25 07:27 eg/ERR188273_chrX.bam
-    ## -rw-r--r-- 1 root root 69983599 Mar 25 07:29 eg/sorted.bam
+    ## -rw-r--r-- 1 root root 69983526 Aug  4 00:29 eg/ERR188273_chrX.bam
+    ## -rw-r--r-- 1 root root 69983599 Aug  4 00:30 eg/sorted.bam
 
 You should use use additional threads (if they are available) to speed
 up sorting; to use four threads, use `-@ 4`.
@@ -327,9 +328,9 @@ time samtools sort eg/ERR188273_chrX.sam -o eg/sorted.bam
 ```
 
     ## 
-    ## real 0m8.748s
-    ## user 0m8.458s
-    ## sys  0m0.244s
+    ## real 0m8.796s
+    ## user 0m8.542s
+    ## sys  0m0.249s
 
 Time taken using four threads.
 
@@ -339,9 +340,9 @@ time samtools sort -@ 4 eg/ERR188273_chrX.sam -o eg/sorted.bam
 
     ## [bam_sort_core] merging from 0 files and 4 in-memory blocks...
     ## 
-    ## real 0m2.896s
-    ## user 0m10.513s
-    ## sys  0m0.484s
+    ## real 0m2.903s
+    ## user 0m10.701s
+    ## sys  0m0.504s
 
 Many of the SAMtools subtools can use additional threads, so make use of
 them if you have the resources\!
@@ -369,7 +370,7 @@ samtools head eg/ERR188273_chrX_rg.bam
     ## @HD  VN:1.0  SO:coordinate
     ## @SQ  SN:chrX LN:156040895
     ## @PG  ID:hisat2   PN:hisat2   VN:2.2.0    CL:"/Users/dtang/github/rnaseq/hisat2/../src/hisat2-2.2.0/hisat2-align-s --wrapper basic-0 --dta -p 4 -x ../raw/chrX_data/indexes/chrX_tran -1 /tmp/4195.inpipe1 -2 /tmp/4195.inpipe2"
-    ## @PG  ID:samtools PN:samtools PP:hisat2   VN:1.19.2   CL:samtools addreplacerg -r @RG\tID:ERR188273\tSM:ERR188273\tPL:illumina -o eg/ERR188273_chrX_rg.bam eg/ERR188273_chrX.bam
+    ## @PG  ID:samtools PN:samtools PP:hisat2   VN:1.22.1   CL:samtools addreplacerg -r @RG\tID:ERR188273\tSM:ERR188273\tPL:illumina -o eg/ERR188273_chrX_rg.bam eg/ERR188273_chrX.bam
     ## @RG  ID:ERR188273    SM:ERR188273    PL:illumina
 
 If you want to replace existing read groups, just use the same command.
@@ -382,8 +383,8 @@ samtools head eg/ERR188273_chrX_rg2.bam
     ## @HD  VN:1.0  SO:coordinate
     ## @SQ  SN:chrX LN:156040895
     ## @PG  ID:hisat2   PN:hisat2   VN:2.2.0    CL:"/Users/dtang/github/rnaseq/hisat2/../src/hisat2-2.2.0/hisat2-align-s --wrapper basic-0 --dta -p 4 -x ../raw/chrX_data/indexes/chrX_tran -1 /tmp/4195.inpipe1 -2 /tmp/4195.inpipe2"
-    ## @PG  ID:samtools PN:samtools PP:hisat2   VN:1.19.2   CL:samtools addreplacerg -r @RG\tID:ERR188273\tSM:ERR188273\tPL:illumina -o eg/ERR188273_chrX_rg.bam eg/ERR188273_chrX.bam
-    ## @PG  ID:samtools.1   PN:samtools PP:samtools VN:1.19.2   CL:samtools addreplacerg -r @RG\tID:ERR188273_2\tSM:ERR188273_2\tPL:illumina_2 -o eg/ERR188273_chrX_rg2.bam eg/ERR188273_chrX_rg.bam
+    ## @PG  ID:samtools PN:samtools PP:hisat2   VN:1.22.1   CL:samtools addreplacerg -r @RG\tID:ERR188273\tSM:ERR188273\tPL:illumina -o eg/ERR188273_chrX_rg.bam eg/ERR188273_chrX.bam
+    ## @PG  ID:samtools.1   PN:samtools PP:samtools VN:1.22.1   CL:samtools addreplacerg -r @RG\tID:ERR188273_2\tSM:ERR188273_2\tPL:illumina_2 -o eg/ERR188273_chrX_rg2.bam eg/ERR188273_chrX_rg.bam
     ## @RG  ID:ERR188273_2  SM:ERR188273_2  PL:illumina_2
 
 Popular alignment tools such as BWA MEM and STAR can add read groups;
@@ -644,7 +645,7 @@ samtools stats eg/ERR188273_chrX.bam | grep ^SN
     ## SN   raw total sequences:    1160084 # excluding supplementary and secondary reads
     ## SN   filtered sequences: 0
     ## SN   sequences:  1160084
-    ## SN   is sorted:  1
+    ## SN   is sorted:  1   # sorted by coordinate
     ## SN   1st fragments:  580042
     ## SN   last fragments: 580042
     ## SN   reads mapped:   1110685
@@ -675,8 +676,8 @@ samtools stats eg/ERR188273_chrX.bam | grep ^SN
     ## SN   average quality:    36.0
     ## SN   insert size average:    182.7
     ## SN   insert size standard deviation: 176.0
-    ## SN   inward oriented pairs:  530763
-    ## SN   outward oriented pairs: 1042
+    ## SN   inward oriented pairs:  530971
+    ## SN   outward oriented pairs: 834
     ## SN   pairs with other orientation:   1004
     ## SN   pairs on different chromosomes: 0
     ## SN   percentage of properly paired reads (%):    91.4
@@ -697,8 +698,8 @@ head eg/ERR188273_chrX_fillmd.bam
     ## @HD  VN:1.0  SO:coordinate
     ## @SQ  SN:chrX LN:156040895
     ## @PG  ID:hisat2   PN:hisat2   VN:2.2.0    CL:"/Users/dtang/github/rnaseq/hisat2/../src/hisat2-2.2.0/hisat2-align-s --wrapper basic-0 --dta -p 4 -x ../raw/chrX_data/indexes/chrX_tran -1 /tmp/4195.inpipe1 -2 /tmp/4195.inpipe2"
-    ## @PG  ID:samtools PN:samtools PP:hisat2   VN:1.19.2   CL:samtools view -b eg/ERR188273_chrX.bam
-    ## @PG  ID:samtools.1   PN:samtools PP:samtools VN:1.19.2   CL:samtools fillmd -e - genome/chrX.fa
+    ## @PG  ID:samtools PN:samtools PP:hisat2   VN:1.22.1   CL:samtools view -b eg/ERR188273_chrX.bam
+    ## @PG  ID:samtools.1   PN:samtools PP:samtools VN:1.22.1   CL:samtools fillmd -e - genome/chrX.fa
     ## ERR188273.4711308    73  chrX    21649   0   5S70M   =   21649   0   CGGGT====================================================================== @@@F=DDFFHGHBHIFFHIGGIFGEGHFHIGIGIFIIIGIGIGGDHIIGIIC@>DGHCHHHGHHFFFFFDEACC@ AS:i:-5 ZS:i:-5 XN:i:0  XM:i:0  XO:i:0  XG:i:0  NM:i:0  MD:Z:70 YT:Z:UP NH:i:2
     ## ERR188273.4711308    133 chrX    21649   0   *   =   21649   0   CTACAGGTGCCCGCCACCATGCCCAGCTAATTTTTTTTGTATTTTTAGTAGAGATGGGGTTTCACTGTGTTGGCC CB@FDFFFHHGFHIJJJJIIIIIIIGGGIJGIIJJJJJJFFHIIIIGECHEHHGGHHFF?AACCDDDDDDDDBCD YT:Z:UP
     ## ERR188273.4711308    329 chrX    233717  0   5S70M   =   233717  0   CGGGT====================================================================== @@@F=DDFFHGHBHIFFHIGGIFGEGHFHIGIGIFIIIGIGIGGDHIIGIIC@>DGHCHHHGHHFFFFFDEACC@ AS:i:-5 ZS:i:-5 XN:i:0  XM:i:0  XO:i:0  XG:i:0  NM:i:0  MD:Z:70 YT:Z:UP NH:i:2
@@ -715,6 +716,7 @@ samtools fastq -1 eg/ERR188273_chrX_1.fq -2 eg/ERR188273_chrX_2.fq eg/ERR188273_
 head eg/ERR188273_chrX_1.fq
 ```
 
+    ## samtools fastq: Coordinate sorted file.  Read pairs may be out of order
     ## [M::bam2fq_mainloop] discarded 0 singletons
     ## [M::bam2fq_mainloop] processed 1160084 reads
     ## @ERR188273.4711308
@@ -821,26 +823,26 @@ samtools mpileup -s -f test_ref.fa aln_bwa.bam aln_mm.bam | head -20
 ```
 
     ## [mpileup] 2 samples in 2 input files
-    ## 1    8238    G   1   ^]. >   ]   1   ^]. >   ]
-    ## 1    8239    G   1   .   >   ]   1   .   >   ]
-    ## 1    8240    A   1   .   J   ]   1   .   J   ]
-    ## 1    8241    C   1   .   J   ]   1   .   J   ]
-    ## 1    8242    A   1   .   J   ]   1   .   J   ]
-    ## 1    8243    C   1   .   J   ]   1   .   J   ]
-    ## 1    8244    T   1   .   J   ]   1   .   J   ]
-    ## 1    8245    G   1   .   J   ]   1   .   J   ]
-    ## 1    8246    C   1   .   J   ]   1   .   J   ]
-    ## 1    8247    G   1   .   J   ]   1   .   J   ]
-    ## 1    8248    A   1   .   J   ]   1   .   J   ]
-    ## 1    8249    C   1   .   J   ]   1   .   J   ]
-    ## 1    8250    A   1   .   J   ]   1   .   J   ]
-    ## 1    8251    G   1   .   J   ]   1   .   J   ]
-    ## 1    8252    T   1   .   J   ]   1   .   J   ]
-    ## 1    8253    G   1   .   J   ]   1   .   J   ]
-    ## 1    8254    A   1   .   J   ]   1   .   J   ]
-    ## 1    8255    G   1   .   J   ]   1   .   J   ]
-    ## 1    8256    G   1   .   J   ]   1   .   J   ]
-    ## 1    8257    G   1   .   J   ]   1   .   J   ]
+    ## 1    2081    A   1   ^]. >   ]   1   ^]. >   ]
+    ## 1    2082    A   1   .   >   ]   1   .   >   ]
+    ## 1    2083    G   1   .   J   ]   1   .   J   ]
+    ## 1    2084    G   1   .   J   ]   1   .   J   ]
+    ## 1    2085    T   1   .   J   ]   1   .   J   ]
+    ## 1    2086    T   1   .   J   ]   1   .   J   ]
+    ## 1    2087    T   1   .   J   ]   1   .   J   ]
+    ## 1    2088    T   1   .   J   ]   1   .   J   ]
+    ## 1    2089    G   1   .   J   ]   1   .   J   ]
+    ## 1    2090    A   1   .   J   ]   1   .   J   ]
+    ## 1    2091    C   1   .   J   ]   1   .   J   ]
+    ## 1    2092    C   1   .   J   ]   1   .   J   ]
+    ## 1    2093    T   1   .   J   ]   1   .   J   ]
+    ## 1    2094    G   1   .   J   ]   1   .   J   ]
+    ## 1    2095    C   1   .   J   ]   1   .   J   ]
+    ## 1    2096    T   1   .   J   ]   1   .   J   ]
+    ## 1    2097    A   1   .   J   ]   1   .   J   ]
+    ## 1    2098    A   1   .   J   ]   1   .   J   ]
+    ## 1    2099    A   1   .   J   ]   1   .   J   ]
+    ## 1    2100    C   1   .   J   ]   1   .   J   ]
 
 Another approach is to use
 [deepTools](https://deeptools.readthedocs.io/en/develop/) and the
@@ -880,7 +882,7 @@ samtools view -H eg/ERR188273_chrX.bam
     ## @HD  VN:1.0  SO:coordinate
     ## @SQ  SN:chrX LN:156040895
     ## @PG  ID:hisat2   PN:hisat2   VN:2.2.0    CL:"/Users/dtang/github/rnaseq/hisat2/../src/hisat2-2.2.0/hisat2-align-s --wrapper basic-0 --dta -p 4 -x ../raw/chrX_data/indexes/chrX_tran -1 /tmp/4195.inpipe1 -2 /tmp/4195.inpipe2"
-    ## @PG  ID:samtools PN:samtools PP:hisat2   VN:1.19.2   CL:samtools view -H eg/ERR188273_chrX.bam
+    ## @PG  ID:samtools PN:samtools PP:hisat2   VN:1.22.1   CL:samtools view -H eg/ERR188273_chrX.bam
 
 Substitute header with new name.
 
