@@ -4,7 +4,7 @@ all: readme
 data: genome/chrX.fa
 tools: github-markdown-toc samtools bwa minimap2 mosdepth pandoc
 pandoc: /usr/bin/pandoc
-samtools_ver := 1.19.2
+samtools_ver := 1.22.1
 minimap2_ver := 2.24
 mosdepth_ver := 0.3.7
 
